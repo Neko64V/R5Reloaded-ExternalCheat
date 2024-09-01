@@ -2,8 +2,8 @@
 #include <TlHelp32.h>
 
 void LoadStyle();
-LONG MenuStyle = WS_EX_LAYERED | WS_EX_TOOLWINDOW;
-LONG ESPStyle = WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW;
+LONG MenuStyle = WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
+LONG ESPStyle = WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
 
 ID3D11Device* g_pd3dDevice = NULL;
 ID3D11DeviceContext* g_pd3dDeviceContext = NULL;
@@ -25,7 +25,7 @@ bool Overlay::CreateOverlay()
     // Create Overlay
     wc = { sizeof(WNDCLASSEXA), 0, WndProc, 0, 0, NULL, NULL, NULL, NULL, Title, Class, NULL};
     RegisterClassExA(&wc);
-    Hwnd = CreateWindowExA(WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW, wc.lpszClassName, wc.lpszMenuName, WS_POPUP | WS_VISIBLE, g.GamePoint.x, g.GamePoint.y, g.GameRect.right, g.GameRect.bottom, NULL, NULL, wc.hInstance, NULL);
+    Hwnd = CreateWindowExA(WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, wc.lpszClassName, wc.lpszMenuName, WS_POPUP | WS_VISIBLE, g.GamePoint.x, g.GamePoint.y, g.GameRect.right, g.GameRect.bottom, NULL, NULL, wc.hInstance, NULL);
     SetLayeredWindowAttributes(Hwnd, RGB(0, 0, 0), 255, LWA_ALPHA);
     MARGINS margin = { -1 };
     DwmExtendFrameIntoClientArea(Hwnd, &margin);
@@ -91,9 +91,9 @@ void Overlay::OverlayManager()
         LONG TmpLong = GetWindowLong(Hwnd, GWL_EXSTYLE);
 
         if (g.ShowMenu && MenuStyle != TmpLong)
-            SetWindowLong(Hwnd, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TOOLWINDOW);
+            SetWindowLong(Hwnd, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
         else if (!g.ShowMenu && ESPStyle != TmpLong)
-            SetWindowLong(Hwnd, GWL_EXSTYLE, WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW);
+            SetWindowLong(Hwnd, GWL_EXSTYLE, WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
 
         // ShowMenu
         static bool menu_key = false;
