@@ -21,10 +21,10 @@ https://learn.microsoft.com/ja-jp/cpp/build/vscpp-step-0-installation?view=msvc-
 ## 使用したライブラリ
 ・Microsoft DirectXTK->SimpleMath  
 https://github.com/microsoft/DirectXTK  
-・ImGui    
+・ImGui  
 https://github.com/ocornut/imgui  
 ・FreeType  
-https://github.com/freetype/freetype
+https://github.com/freetype/freetype  
 
 ## 免責事項
 このプロジェクトは学習や研究・教育用としてアップロードされました。  
