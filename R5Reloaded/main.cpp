@@ -53,13 +53,6 @@ void Overlay::OverlayLoop()
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		HWND ForegroundWindow = GetForegroundWindow();
-		if (ForegroundWindow == g.GameHwnd)
-		{
-			HWND TempProcessHwnd = GetWindow(ForegroundWindow, GW_HWNDPREV);
-			SetWindowPos(Hwnd, TempProcessHwnd, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		}
-
 		if (g.ShowMenu)
 			cx->RenderMenu();
 
