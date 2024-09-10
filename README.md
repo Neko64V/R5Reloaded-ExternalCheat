@@ -14,10 +14,6 @@ R5Reloadedの外部チートです。チート開発に対する興味を失っ�
 * ある程度フレームワーク化を行ったので、他のゲームのチートへ比較的簡単に転用可能。
 * OpenProcessやTOPMOSTオーバーレイを採用しているのでEACやBEのようなアンチチートには対策が必要。
 
-### ベースとしての使用
-”ある程度”フレームワーク化しているだけなので、最適化や非効率な部分がいくらかあります。  
-また、場合によってはMemoryやOverlayに微調整が必要になります（FindWindowでクラス名を使用するようにするくらいですが…。）
-
 ## 実行
 必要なライブラリは全て揃っているので、VisualStudioでビルドすれば普通に動くはずです。  
 https://learn.microsoft.com/ja-jp/cpp/build/vscpp-step-0-installation?view=msvc-170
