@@ -5,7 +5,7 @@ bool Memory::AttachProcess(const char* targetName, int mode)
     switch (mode)
     {
     case InitMode::WINDOW_TITLE: {
-        HWND TargetHwnd = FindWindowA(NULL, targetName.c_str());
+        HWND TargetHwnd = FindWindowA(NULL, targetName);
 
         if (!TargetHwnd) {
             MessageBoxA(nullptr, "Please open { GAME NAME #1 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
@@ -16,7 +16,7 @@ bool Memory::AttachProcess(const char* targetName, int mode)
         break;
     }
     case InitMode::WINDOW_CLASS: {
-        HWND TargetHwnd = FindWindowA(targetName.c_str(), NULL);
+        HWND TargetHwnd = FindWindowA(targetName, NULL);
 
         if (!TargetHwnd) {
             MessageBoxA(nullptr, "Please open { GAME NAME #1 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
