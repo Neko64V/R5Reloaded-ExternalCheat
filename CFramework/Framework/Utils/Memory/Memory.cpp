@@ -1,6 +1,6 @@
 ﻿#include "Memory.h"
 
-bool Memory::AttachProcess(const std::string targetName, int mode)
+bool Memory::AttachProcess(const char* targetName, int mode)
 {
     switch (mode)
     {
