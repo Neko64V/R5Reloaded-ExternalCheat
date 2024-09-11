@@ -3,12 +3,12 @@
 LONG MenuStyle = WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
 LONG ESPStyle = WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
 
-bool Overlay::InitOverlay(const std::string targetName, int mode)
+bool Overlay::InitOverlay(const char* targetName, int mode)
 {
     switch (mode)
     {
     case InitMode::WINDOW_TITLE:
-        TargetHwnd = FindWindowA(NULL, targetName.c_str());
+        TargetHwnd = FindWindowA(NULL, targetName);
 
         if (!TargetHwnd) {
             MessageBoxA(nullptr, "Target not found Mode: 0", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
@@ -16,7 +16,7 @@ bool Overlay::InitOverlay(const std::string targetName, int mode)
         }
         break;
     case InitMode::WINDOW_CLASS:
-        TargetHwnd = FindWindowA(targetName.c_str(), NULL);
+        TargetHwnd = FindWindowA(targetName, NULL);
 
         if (!TargetHwnd) {
             MessageBoxA(nullptr, "Target not found Mode: 1", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
