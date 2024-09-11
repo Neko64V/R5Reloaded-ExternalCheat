@@ -29,7 +29,7 @@ private:
 public:
 	uintptr_t g_BaseAddress;
 
-	bool AttachProcess(const std::string targetName, int mode);
+	bool AttachProcess(const char* targetName, int mode);
 	void DetachProcess();
 
 	template <typename T>
