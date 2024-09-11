@@ -86,9 +86,11 @@ void CFramework::RenderESP()
         float Height = abs(abs(pHead.y) - abs(pBase.y));
         float Width = Height / 2.f;
         float bScale = Width / 1.5f;
-
-        // 対象が見えてるかチェックするよ。
-        bool visible = pEntity->m_lastvisibletime + 0.2f >= TimeBase;
+    
+        /* 対象が見えてるかチェックするよ。
+        前のループで取得したLastVisibleTimeを保存しておくよりも安定するが、
+        Ping値による影響があるかを確認する必要がある。 */
+        bool visible = pEntity->m_lastvisibletime + 0.1f >= TimeBase;
 
         // ESPの色を決めるよ
         ImColor color = visible ? ESP_Visible : ESP_Default;
