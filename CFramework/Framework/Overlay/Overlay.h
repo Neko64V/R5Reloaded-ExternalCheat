@@ -26,7 +26,7 @@ private:
 	bool CreateOverlay();
 	HWND GetTargetWindow(const std::string processName);	// 実行ファイル名からウィンドウハンドルを取得する
 public:
-	bool InitOverlay(const std::string targetName, int mode);
+	bool InitOverlay(const char* targetName, int mode);
 	void OverlayLoop();
 	void DestroyOverlay();
 	void OverlayManager();
