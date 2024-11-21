@@ -22,10 +22,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!ov->InitOverlay("Apex Legends", InitMode::WINDOW_TITLE)) // MemoryInitModeと同様
 		return 2;
 
-	// Cheat
-	if (!cx->Init())
-		return 3;
-
 	// スレッドを作成
 	std::thread([&]() { cx->UpdateList(); }).detach(); // ESP/AIM用にプレイヤーのデータをキャッシュする
 

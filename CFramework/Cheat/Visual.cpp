@@ -3,8 +3,8 @@
 void CFramework::RenderInfo()
 {
     // ウォーターマーク
-    std::string text = "R5Reloaded | " + std::to_string((int)ImGui::GetIO().Framerate) + "FPS ";
-    StringEx(ImVec2(8.f, 8.f), ImColor(1.f, 1.f, 1.f, 1.f), 14.f, text.c_str());
+    std::string text = "R5Reloaded";
+    StringEx(ImVec2(8.f, 8.f), ImColor(1.f, 1.f, 1.f, 1.f), ImGui::GetFontSize(), text.c_str());
 
     ImGui::GetStyle().AntiAliasedLines = false;
 

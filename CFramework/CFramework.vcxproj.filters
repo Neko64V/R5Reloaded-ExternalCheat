@@ -28,9 +28,6 @@
     <Filter Include="Framework\Utils">
       <UniqueIdentifier>{04b8cfc8-34d2-4204-b232-2352bc502d06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Framework\ImGui\Font">
-      <UniqueIdentifier>{9e24f3d5-63c4-4e7e-90ad-ef156b2b2501}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Framework\Utils\Config">
       <UniqueIdentifier>{c82edab8-686a-41c7-96f1-7031c65e600e}</UniqueIdentifier>
     </Filter>
@@ -64,9 +61,6 @@
       <Filter>Framework\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Framework\ImGui\imgui_draw.cpp">
-      <Filter>Framework\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="Framework\ImGui\imgui_freetype.cpp">
       <Filter>Framework\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Framework\ImGui\imgui_impl_dx11.cpp">
@@ -113,9 +107,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Framework\ImGui\Font\RobotoRegular.h">
-      <Filter>Framework\ImGui\Font</Filter>
-    </ClInclude>
     <ClInclude Include="Framework\ImGui\Custom.h">
       <Filter>Framework\ImGui</Filter>
     </ClInclude>
@@ -123,9 +114,6 @@
       <Filter>Framework\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Framework\ImGui\imgui.h">
-      <Filter>Framework\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Framework\ImGui\imgui_freetype.h">
       <Filter>Framework\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Framework\ImGui\imgui_impl_dx11.h">

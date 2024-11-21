@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\Framework\Libs\include;</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)\Framework\Libs;</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\Framework\Libs\include;</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)\Framework\Libs;</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -146,7 +146,6 @@
     <ClCompile Include="Framework\ImGui\imgui.cpp" />
     <ClCompile Include="Framework\ImGui\imgui_demo.cpp" />
     <ClCompile Include="Framework\ImGui\imgui_draw.cpp" />
-    <ClCompile Include="Framework\ImGui\imgui_freetype.cpp" />
     <ClCompile Include="Framework\ImGui\imgui_impl_dx11.cpp" />
     <ClCompile Include="Framework\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="Framework\ImGui\imgui_tables.cpp" />
@@ -163,10 +162,8 @@
     <ClInclude Include="Cheat\SDK\CEntity\CEntity.h" />
     <ClInclude Include="Cheat\SDK\GameSDK\GameSDK.h" />
     <ClInclude Include="Framework\ImGui\Custom.h" />
-    <ClInclude Include="Framework\ImGui\Font\RobotoRegular.h" />
     <ClInclude Include="Framework\ImGui\imconfig.h" />
     <ClInclude Include="Framework\ImGui\imgui.h" />
-    <ClInclude Include="Framework\ImGui\imgui_freetype.h" />
     <ClInclude Include="Framework\ImGui\imgui_impl_dx11.h" />
     <ClInclude Include="Framework\ImGui\imgui_impl_win32.h" />
     <ClInclude Include="Framework\ImGui\imgui_internal.h" />

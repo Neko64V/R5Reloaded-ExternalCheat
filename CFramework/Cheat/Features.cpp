@@ -11,16 +11,6 @@ Vector3 GetPredict(CEntity& target , float dist)
     return vOut;
 }
 
-bool CFramework::Init()
-{
-    // LoadFont
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.Fonts->AddFontFromMemoryCompressedTTF(RobotoRegular_compressed_data, RobotoRegular_compressed_size, 14.f, nullptr);
-    io.Fonts->Build();
-
-    return true;
-}
-
 bool CFramework::AimBot(CEntity& target)
 {
     /*----| SomeChecks |--------------------------------------------------------------------------------*/

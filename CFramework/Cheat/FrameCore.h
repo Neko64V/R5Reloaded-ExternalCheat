@@ -3,14 +3,11 @@
 #include "../Framework/ImGui/imgui_impl_win32.h"
 #include "../Framework/ImGui/imgui_impl_dx11.h"
 #include "../Framework/ImGui/Custom.h"
-#include "../Framework/ImGui/Font/RobotoRegular.h"
 #include "SDK/CEntity/CEntity.h"
-#pragma comment(lib, "freetype.lib")
 
 class CFramework
 {
 public:
-    bool Init();
     void UpdateList();
     bool AimBot(CEntity& target);
 
