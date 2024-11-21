@@ -49,7 +49,7 @@ struct Globals
     int g_CrosshairType = 0;
 
     // Key
-    int g_MenuKey = VK_END;
+    int g_MenuKey = VK_INSERT;
     int g_AimKey0 = VK_RBUTTON;
     int g_AimKey1 = VK_LBUTTON;
 };
