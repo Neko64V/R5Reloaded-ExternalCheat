@@ -13,7 +13,7 @@ void KeyBinder(int& target_key, int& BindID)
     {
         for (int i = 0; i < 0x87; i++)
         {
-            if (i == VK_LWIN || i == VK_RWIN || i == g.MenuKey)
+            if (i == VK_LWIN || i == VK_RWIN || i == g.g_MenuKey)
                 continue;
 
             if (IsKeyDown(i))
@@ -25,8 +25,8 @@ void KeyBinder(int& target_key, int& BindID)
     }
 
     // Check
-    if (g.AimKey0 == g.AimKey1)
-        g.AimKey1 = 0;
+    if (g.g_AimKey0 == g.g_AimKey1)
+        g.g_AimKey1 = 0;
 
     BindID = NULL;
 }

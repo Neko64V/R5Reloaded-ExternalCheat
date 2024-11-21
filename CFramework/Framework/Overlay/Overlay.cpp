@@ -17,18 +17,18 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 bool Overlay::CreateOverlay()
 {
     // Get ClientSize
-    GetClientRect(g.GameHwnd, &g.GameRect);
-    ClientToScreen(g.GameHwnd, &g.GamePoint);
+    GetClientRect(g.g_GameHwnd, &g.g_GameRect);
+    ClientToScreen(g.g_GameHwnd, &g.g_GamePoint);
 
     // Create Overlay
-    wc = { sizeof(WNDCLASSEXA), 0, WndProc, 0, 0, NULL, NULL, NULL, NULL, Title, Class, NULL};
+    wc = { sizeof(WNDCLASSEXA), 0, WndProc, 0, 0, NULL, NULL, NULL, NULL, m_OTitle, m_OClass, NULL};
     RegisterClassExA(&wc);
-    Hwnd = CreateWindowExA(WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, wc.lpszClassName, wc.lpszMenuName, WS_POPUP | WS_VISIBLE, g.GamePoint.x, g.GamePoint.y, g.GameRect.right, g.GameRect.bottom, NULL, NULL, wc.hInstance, NULL);
-    SetLayeredWindowAttributes(Hwnd, RGB(0, 0, 0), 255, LWA_ALPHA);
+    m_Hwnd = CreateWindowExA(WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, wc.lpszClassName, wc.lpszMenuName, WS_POPUP | WS_VISIBLE, g.g_GamePoint.x, g.g_GamePoint.y, g.g_GameRect.right, g.g_GameRect.bottom, NULL, NULL, wc.hInstance, NULL);
+    SetLayeredWindowAttributes(m_Hwnd, RGB(0, 0, 0), 255, LWA_ALPHA);
     MARGINS margin = { -1 };
-    DwmExtendFrameIntoClientArea(Hwnd, &margin);
+    DwmExtendFrameIntoClientArea(m_Hwnd, &margin);
 
-    if (!CreateDeviceD3D(Hwnd))
+    if (!CreateDeviceD3D(m_Hwnd))
     {
         CleanupDeviceD3D();
         UnregisterClassA(wc.lpszClassName, wc.hInstance);
@@ -36,8 +36,8 @@ bool Overlay::CreateOverlay()
         return false;
     }
 
-    ShowWindow(Hwnd, SW_SHOWDEFAULT);
-    UpdateWindow(Hwnd);
+    ShowWindow(m_Hwnd, SW_SHOWDEFAULT);
+    UpdateWindow(m_Hwnd);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -46,7 +46,7 @@ bool Overlay::CreateOverlay()
     io.LogFilename = nullptr;
 
     LoadStyle();
-    ImGui_ImplWin32_Init(Hwnd);
+    ImGui_ImplWin32_Init(m_Hwnd);
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
     return true;
@@ -59,7 +59,7 @@ void Overlay::DestroyOverlay()
     ImGui::DestroyContext();
 
     CleanupDeviceD3D();
-    DestroyWindow(Hwnd);
+    DestroyWindow(m_Hwnd);
     UnregisterClassA(wc.lpszClassName, wc.hInstance);
 }
 
@@ -135,6 +135,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
+        return 0;
+    case WM_DPICHANGED:
+        RECT* suggestedRect = (RECT*)lParam;
+        SetWindowPos(hWnd, NULL, suggestedRect->left, suggestedRect->top, suggestedRect->right - suggestedRect->left, suggestedRect->bottom - suggestedRect->top, SWP_NOZORDER | SWP_NOACTIVATE);
         return 0;
     }
     return DefWindowProcA(hWnd, msg, wParam, lParam);

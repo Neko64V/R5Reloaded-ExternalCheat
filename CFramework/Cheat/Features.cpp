@@ -25,24 +25,24 @@ bool CFramework::AimBot(CEntity& target)
 {
     /*----| SomeChecks |--------------------------------------------------------------------------------*/
    // 1st
-    if (g.AimKey0 == NULL || !IsKeyDown(g.AimKey0) && !IsKeyDown(g.AimKey1) || g.ShowMenu)
+    if (g.g_AimKey0 == NULL || !IsKeyDown(g.g_AimKey0) && !IsKeyDown(g.g_AimKey1) || g.g_ShowMenu)
         return false;
 
     // 2nd
-    switch (g.AimKeyType)
+    switch (g.g_AimKeyType)
     {
     case 0: // and
-        if (g.AimKey1 == NULL && IsKeyDown(g.AimKey0))
+        if (g.g_AimKey1 == NULL && IsKeyDown(g.g_AimKey0))
             break;
-        else if (!IsKeyDown(g.AimKey0) || !IsKeyDown(g.AimKey1))
+        else if (!IsKeyDown(g.g_AimKey0) || !IsKeyDown(g.g_AimKey1))
             return false;
-        else if (!IsKeyDown(g.AimKey0))
+        else if (!IsKeyDown(g.g_AimKey0))
             return false;
         break;
     case 1: // or
-        if (g.AimKey1 == NULL && IsKeyDown(g.AimKey0))
+        if (g.g_AimKey1 == NULL && IsKeyDown(g.g_AimKey0))
             break;
-        else if (IsKeyDown(g.AimKey0) || IsKeyDown(g.AimKey1))
+        else if (IsKeyDown(g.g_AimKey0) || IsKeyDown(g.g_AimKey1))
             break;
 
         break;
@@ -57,14 +57,13 @@ bool CFramework::AimBot(CEntity& target)
     else if (!pTarget->Update())
         return false;
 
-    Vector2 ScreenMiddle = { (float)g.GameRect.right / 2.f, (float)g.GameRect.bottom / 2.f };
+    Vector2 ScreenMiddle = { (float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom / 2.f };
     int AimBone = 8;
-    float BaseTime = m.Read<float>(pLocal->entity + 0x1d18);
-    uintptr_t ViewRenderer = m.Read<uintptr_t>(m.g_BaseAddress + offset::ViewRender);
+    uintptr_t ViewRenderer = m.Read<uintptr_t>(m.m_gBaseAddress + offset::ViewRender);
     Matrix ViewMatrix = m.Read<Matrix>(m.Read<uintptr_t>(ViewRenderer + offset::ViewMatrix));
 
     // Set
-    switch (g.Aim_Bone)
+    switch (g.g_Aim_Bone)
     {
     case 0:
         AimBone = 8;
@@ -81,17 +80,17 @@ bool CFramework::AimBot(CEntity& target)
 
     TargetBone += GetPredict(target, distance);
 
-    Vector2 g_Screen{};
-    if (!WorldToScreen(ViewMatrix, g.GameRect, TargetBone, g_Screen))
+    Vector2 ScreenPos{};
+    if (!WorldToScreen(ViewMatrix, g.g_GameRect, TargetBone, ScreenPos))
         return false;
 
-    if (g.Aim_Mode == 0)
+    if (g.g_Aim_Mode == 0)
     {
         Vector3 Angle = CalcAngle(pLocal->camera_origin, TargetBone);
         Vector3 ViewAngle = pLocal->m_ViewAngle;
         Vector3 Delta = Angle - ViewAngle;
 
-        if (g.Aim_NoSway)
+        if (g.g_Aim_NoSway)
         {
             Vector3 Breath = pLocal->m_SwayAngle - ViewAngle;
 
@@ -100,7 +99,7 @@ bool CFramework::AimBot(CEntity& target)
         }
 
         NormalizeAngles(Delta);
-        Vector3 SmoothedAngle = ViewAngle + (Delta / g.Aim_Smooth);
+        Vector3 SmoothedAngle = ViewAngle + (Delta / g.g_Aim_Smooth);
         NormalizeAngles(SmoothedAngle);
 
         if (!Vec3_Empty(SmoothedAngle))
@@ -108,8 +107,8 @@ bool CFramework::AimBot(CEntity& target)
     }
     else
     {
-        int cX = (ScreenMiddle.x - g_Screen.x) / g.Aim_Smooth;
-        int cY = (ScreenMiddle.y - g_Screen.y) / g.Aim_Smooth;
+        int cX = (ScreenMiddle.x - ScreenPos.x) / g.g_Aim_Smooth;
+        int cY = (ScreenMiddle.y - ScreenPos.y) / g.g_Aim_Smooth;
 
         mouse_event(MOUSEEVENTF_MOVE, -cX, -cY, 0, 0);
     }
@@ -117,10 +116,10 @@ bool CFramework::AimBot(CEntity& target)
 
 void CFramework::UpdateList()
 {
-    while (g.Run)
+    while (g.g_Run)
     {
         // GetLocal
-        uintptr_t lp = m.Read<uintptr_t>(m.g_BaseAddress + offset::dwLocalPlayer);
+        uintptr_t lp = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwLocalPlayer);
         if (!local.GetEntity(lp)) {
             Sleep(10);
             continue;
@@ -131,7 +130,7 @@ void CFramework::UpdateList()
         for (int i = 0; i < 15000; i++)
         {
             CEntity entity{};
-            uintptr_t address = m.Read<uintptr_t>(m.g_BaseAddress + offset::dwEntityList + (i * 0x20));
+            uintptr_t address = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwEntityList + (i * 0x20));
 
             if (address == NULL || address == lp)
                 continue;  

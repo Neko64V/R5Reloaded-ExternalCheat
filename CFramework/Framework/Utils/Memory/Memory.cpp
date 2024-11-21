@@ -12,29 +12,29 @@ bool Memory::AttachProcess(const char* targetName, int mode)
             return false;
         }
 
-        GetWindowThreadProcessId(TargetHwnd, &PID);
+        GetWindowThreadProcessId(TargetHwnd, &m_PID);
         break;
     }
     case InitMode::WINDOW_CLASS: {
         HWND TargetHwnd = FindWindowA(targetName, NULL);
 
         if (!TargetHwnd) {
-            MessageBoxA(nullptr, "Please open { GAME NAME #1 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+            MessageBoxA(nullptr, "Please open { GAME NAME #2 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
             return false;
         }
 
-        GetWindowThreadProcessId(TargetHwnd, &PID);
+        GetWindowThreadProcessId(TargetHwnd, &m_PID);
         break;
     }
     case InitMode::PROCESS: {
         PROCESSENTRY32 process = GetProcess(targetName);
 
         if (process.th32ProcessID == 0) {
-            MessageBoxA(nullptr, "Please open { GAME NAME #2 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+            MessageBoxA(nullptr, "Please open { GAME NAME #3 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
             return false;
         }
 
-        PID = process.th32ProcessID;
+        m_PID = process.th32ProcessID;
         break;
     }
     default:
@@ -43,32 +43,32 @@ bool Memory::AttachProcess(const char* targetName, int mode)
     }
 
     // プロセスハンドルを取得
-    pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID);
+    m_pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_PID);
 
-    if (!pHandle) {
+    if (!m_pHandle) {
         MessageBoxA(nullptr, "Failed to get process handle", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK); // 管理者として実行するかアンチチートをバイパスする
         return false;
     }
 
     // ベースアドレスを取得
-    g_BaseAddress = GetModuleBase("r5apex.exe");
+    m_gBaseAddress = GetModuleBase("r5apex.exe");
 
-    if (g_BaseAddress == 0)
-        MessageBoxA(nullptr, "Base is 0", "WARNING", MB_OK | MB_TOPMOST);
+    if (m_gBaseAddress == 0)
+        MessageBoxA(nullptr, "BaseAddress is 0", "WARNING", MB_OK | MB_TOPMOST);
 
     return true;
 }
 
 void Memory::DetachProcess()
 {
-    CloseHandle(pHandle);
+    CloseHandle(m_pHandle);
 }
 
 uintptr_t Memory::GetModuleBase(const std::string moduleName)
 {
     MODULEENTRY32 entry{};
     entry.dwSize = sizeof(MODULEENTRY32);
-    const auto snapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, PID);
+    const auto snapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, m_PID);
 
     while (Module32Next(snapShot, &entry))
     {

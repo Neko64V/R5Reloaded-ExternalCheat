@@ -27,13 +27,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 3;
 
 	// スレッドを作成
-	std::thread([&]() { ov->OverlayManager(); }).detach();
-	std::thread([&]() { cx->UpdateList(); }).detach();
+	std::thread([&]() { cx->UpdateList(); }).detach(); // ESP/AIM用にプレイヤーのデータをキャッシュする
 
 	ov->OverlayLoop();
 	ov->DestroyOverlay();
 	m.DetachProcess();
-	g.Run = false;
+	g.g_Run = false;
 	delete cx, ov;
 
 	return 0;
@@ -41,29 +40,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void Overlay::OverlayLoop()
 {
-	while (g.Run)
+	while (g.g_Run)
 	{
 		MSG msg;
-		while (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
-		{
+		while (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		// オーバーレイウィンドウの位置やサイズ等のチェック
+		OverlayManager();
 
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		if (g.ShowMenu)
+		if (g.g_ShowMenu)
 			cx->RenderMenu();
 
 		cx->RenderInfo();
 
-		if (g.ESP)
+		if (g.g_ESP)
 			cx->RenderESP();
 
 		ImGui::Render();
-		const float clear_color_with_alpha[4] = { 0.f, 0.f, 0.f, 0.f };
+		static const float clear_color_with_alpha[4] = { 0.f, 0.f, 0.f, 0.f };
 		g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
 		g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

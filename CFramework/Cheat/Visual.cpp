@@ -9,22 +9,22 @@ void CFramework::RenderInfo()
     ImGui::GetStyle().AntiAliasedLines = false;
 
     // FovCircle
-    if (g.AimBot && g.Aim_DrawFov)
-        ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(g.GameRect.right / 2.f, g.GameRect.bottom / 2.f), g.Aim_Fov, FOV_User);
+    if (g.g_AimBot && g.g_Aim_DrawFov)
+        ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(g.g_GameRect.right / 2.f, g.g_GameRect.bottom / 2.f), g.g_Aim_Fov, FOV_User);
 
     // Crosshair
-    if (g.Crosshair)
+    if (g.g_Crosshair)
     {
-        switch (g.CrosshairType)
+        switch (g.g_CrosshairType)
         {
         case 0: {
-            ImVec2 Center = ImVec2(g.GameRect.right / 2, g.GameRect.bottom / 2);
-            ImGui::GetBackgroundDrawList()->AddLine(ImVec2(Center.x - g.CrosshairSize, Center.y), ImVec2((Center.x + g.CrosshairSize) + 1, Center.y), CrosshairColor, 1);
-            ImGui::GetBackgroundDrawList()->AddLine(ImVec2(Center.x, Center.y - g.CrosshairSize), ImVec2(Center.x, (Center.y + g.CrosshairSize) + 1), CrosshairColor, 1);
+            ImVec2 Center = ImVec2(g.g_GameRect.right / 2, g.g_GameRect.bottom / 2);
+            ImGui::GetBackgroundDrawList()->AddLine(ImVec2(Center.x - g.g_CrosshairSize, Center.y), ImVec2((Center.x + g.g_CrosshairSize) + 1, Center.y), CrosshairColor, 1);
+            ImGui::GetBackgroundDrawList()->AddLine(ImVec2(Center.x, Center.y - g.g_CrosshairSize), ImVec2(Center.x, (Center.y + g.g_CrosshairSize) + 1), CrosshairColor, 1);
         }   break;
         case 1:
-            ImGui::GetBackgroundDrawList()->AddCircleFilled(ImVec2((float)g.GameRect.right / 2.f, (float)g.GameRect.bottom / 2.f), g.CrosshairSize + 1, ImColor(0.f, 0.f, 0.f, 1.f), NULL);
-            ImGui::GetBackgroundDrawList()->AddCircleFilled(ImVec2((float)g.GameRect.right / 2.f, (float)g.GameRect.bottom / 2.f), g.CrosshairSize, CrosshairColor, NULL);
+            ImGui::GetBackgroundDrawList()->AddCircleFilled(ImVec2((float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom / 2.f), g.g_CrosshairSize + 1, ImColor(0.f, 0.f, 0.f, 1.f), NULL);
+            ImGui::GetBackgroundDrawList()->AddCircleFilled(ImVec2((float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom / 2.f), g.g_CrosshairSize, CrosshairColor, NULL);
             break;
         }
     }
@@ -45,11 +45,10 @@ void CFramework::RenderESP()
     float MinFov = 999.f;
     float MinDistance = 9999.f;
     CEntity target = CEntity();
-    Vector2 ScreenMiddle = { (float)g.GameRect.right / 2.f, (float)g.GameRect.bottom / 2.f };
+    Vector2 ScreenMiddle = { (float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom / 2.f };
 
     // ViewMatrixとかいろいろ
-    float TimeBase = pLocal->GetTimeBase();
-    uintptr_t ViewRenderer = m.Read<uintptr_t>(m.g_BaseAddress + offset::ViewRender);
+    uintptr_t ViewRenderer = m.Read<uintptr_t>(m.m_gBaseAddress + offset::ViewRender);
     Matrix ViewMatrix = m.Read<Matrix>(m.Read<uintptr_t>(ViewRenderer + offset::ViewMatrix));
 
     // るーぷするよ
@@ -61,7 +60,7 @@ void CFramework::RenderESP()
             SpectatorList.push_back(pEntity->GetName());
             continue;
         }
-        else if (!g.ESP_NPC && !pEntity->IsPlayer()) {
+        else if (!g.g_ESP_NPC && !pEntity->IsPlayer()) {
             continue;
         }
         
@@ -71,15 +70,15 @@ void CFramework::RenderESP()
         // 距離を取得
         float pDistance = ((pLocal->m_localOrigin - pEntity->m_localOrigin).Length() * 0.01905f);
 
-        if (g.ESP_MaxDistance < pDistance)
+        if (g.g_ESP_MaxDistance < pDistance)
             continue;
-        else if (!g.ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
+        else if (!g.g_ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
             continue;
 
         // 頭とベース位置の座標(3D/2D)を取得
         Vector2 pBase{}, pHead{};
         Vector3 Head = pEntity->GetEntityBonePosition(8) + Vector3(0.f, 0.f, 12.f);
-        if (!WorldToScreen(ViewMatrix, g.GameRect, pEntity->m_localOrigin + Vector3(0.f, 0.f, -6.f), pBase) || !WorldToScreen(ViewMatrix, g.GameRect, Head, pHead))
+        if (!WorldToScreen(ViewMatrix, g.g_GameRect, pEntity->m_localOrigin + Vector3(0.f, 0.f, -6.f), pBase) || !WorldToScreen(ViewMatrix, g.g_GameRect, Head, pHead))
             continue;
 
         // ESP Box等のサイズ算出
@@ -88,28 +87,28 @@ void CFramework::RenderESP()
         float bScale = Width / 1.5f;
     
         /* 対象が見えてるかチェックするよ。
-        前のループで取得したLastVisibleTimeを保存しておくよりも安定するが、
-        Ping値による影響があるかを確認する必要がある。 */
-        bool visible = pEntity->m_lastvisibletime + 0.1f >= TimeBase;
+        前のループで取得したLastVisibleTimeを保存しておくよりも安定する。
+        ただし、Ping値による影響があるかどうかを確認する必要がある。 */
+        bool visible = pEntity->m_lastvisibletime + 0.1f >= pLocal->GetTimeBase();
 
-        // ESPの色を決めるよ
+        // ESPの色を決める
         ImColor color = visible ? ESP_Visible : ESP_Default;
 
-        if (g.ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
+        if (g.g_ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
             color = ESP_Team;
 
         // LINE
-        if (g.ESP_Line)
-            DrawLine(ImVec2((float)g.GameRect.right / 2.f, (float)g.GameRect.bottom), ImVec2(pBase.x, pBase.y), color, 1.f);
+        if (g.g_ESP_Line)
+            DrawLine(ImVec2((float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom), ImVec2(pBase.x, pBase.y), color, 1.f);
 
         // BOX
-        if (g.ESP_Box)
+        if (g.g_ESP_Box)
         {
             // BOX FILLED
-            if (g.ESP_BoxFilled)
+            if (g.g_ESP_BoxFilled)
                 ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(pBase.x - bScale, pHead.y), ImVec2(pBase.x + bScale, pBase.y), ESP_Filled);
 
-            switch (g.ESP_BoxType)
+            switch (g.g_ESP_BoxType)
             {
             case 0:
                 DrawLine(ImVec2(pBase.x - bScale, pHead.y), ImVec2(pBase.x + bScale, pHead.y), color, 1.f);
@@ -131,7 +130,7 @@ void CFramework::RenderESP()
         }
 
         // Healthbar
-        if (g.ESP_HealthBar)
+        if (g.g_ESP_HealthBar)
         {
             HealthBar(((pBase.x - bScale) - 4.f), pBase.y, 2, -Height, pEntity->m_iHealth, pEntity->m_iMaxHealth);
 
@@ -140,35 +139,35 @@ void CFramework::RenderESP()
         }
 
         // Distance
-        if (g.ESP_Distance) {
+        if (g.g_ESP_Distance) {
             std::string DistStr = std::to_string((int)pDistance) + "m";
             String(ImVec2(pBase.x - (ImGui::CalcTextSize(DistStr.c_str()).x / 2.f), pBase.y + 1.f), ImColor(1.f, 1.f, 1.f, 1.f), DistStr.c_str());
         }
 
         // Name
-        if (g.ESP_Name) {
+        if (g.g_ESP_Name) {
             std::string pName = pEntity->IsPlayer() ? pEntity->GetName() : "NPC"; // プレイヤーかダミーかの判定
             String(ImVec2(pBase.x - (ImGui::CalcTextSize(pName.c_str()).x / 2.f), pHead.y -14.f), ImColor(1.f, 1.f, 1.f, 1.f), pName.c_str());
         }
 
         // Glow
-        if (g.ESP_Glow) {
+        if (g.g_ESP_Glow) {
             pEntity->SetGlow(GlowColor{ color.Value.x, color.Value.y, color.Value.z }, GlowMode{ 101, 6, 85, 96 });
         }
-        else if (!g.ESP_Glow && m.Read<int>(pEntity->entity + 0x310) != 0) {
+        else if (!g.g_ESP_Glow && m.Read<int>(pEntity->entity + 0x310) != 0) {
             m.Write<int>(pEntity->entity + 0x310, 0);
             m.Write<int>(pEntity->entity + 0x320, 0);
         }
 
         // AimBot
-        if (g.AimBot)
+        if (g.g_AimBot)
         {
             // Check
-            if (g.Aim_VisCheck && !visible)
+            if (g.g_Aim_VisCheck && !visible)
                 continue;
-            else if (!g.Aim_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
+            else if (!g.g_Aim_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
                 continue;
-            else if (!g.Aim_NPC && !pEntity->IsPlayer())
+            else if (!g.g_Aim_NPC && !pEntity->IsPlayer())
                 continue;
 
             // FOV Check
@@ -179,19 +178,19 @@ void CFramework::RenderESP()
                 if (Vec3_Empty(CheckBone) || CheckBone == pEntity->m_localOrigin)
                     continue;
 
-                // 弱者男性(自称)なのでこうやるしかない。ぴえん。
+                // 弱者男性なのでこうやるしかない。StudioHDRでHitBox取得してもいいけど気力がない
                 float B2B = (pEntity->m_localOrigin - CheckBone).Length() * 0.01905f;
 
                 if (B2B > 2.f)
                     continue;
-                else if (!WorldToScreen(ViewMatrix, g.GameRect, CheckBone, pBone))
+                else if (!WorldToScreen(ViewMatrix, g.g_GameRect, CheckBone, pBone))
                     continue;
 
                 FOV = abs((ScreenMiddle - pBone).Length());
 
-                if (FOV < g.Aim_Fov)
+                if (FOV < g.g_Aim_Fov)
                 {
-                    switch (g.Aim_Type)
+                    switch (g.g_Aim_Type)
                     {
                         // Crosshair
                     case 0:
@@ -216,6 +215,6 @@ void CFramework::RenderESP()
     }
 
     // AimBotのターゲットがいたらAimBotする
-    if (g.AimBot && target.entity != NULL)
+    if (g.g_AimBot && target.entity != NULL)
         AimBot(target);
 }

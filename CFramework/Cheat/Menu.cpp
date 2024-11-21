@@ -21,7 +21,7 @@ void CFramework::RenderMenu()
 
     ImGui::SetNextWindowBgAlpha(0.975f);
     ImGui::SetNextWindowSize(ImVec2(725.f, 450.f));
-    ImGui::Begin("R5Reloaded [ EXTERNAL ]", &g.ShowMenu, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("R5Reloaded [ EXTERNAL ]", &g.g_ShowMenu, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     //---// Clild 0 //-----------------------------------//
     ImGui::BeginChild("##SelectChild", ImVec2(150.f, ImGui::GetContentRegionAvail().y), false);
@@ -54,9 +54,9 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
 
-        ImGui::Checkbox("AimBot", &g.AimBot);
-        ImGui::Checkbox("Prediction", &g.Aim_Prediction);
-        ImGui::Checkbox("Visibility Check", &g.Aim_VisCheck);
+        ImGui::Checkbox("AimBot", &g.g_AimBot);
+        ImGui::Checkbox("Prediction", &g.g_Aim_Prediction);
+        ImGui::Checkbox("Visibility Check", &g.g_Aim_VisCheck);
 
         ImGui::Spacing();
         ImGui::NewLine();
@@ -65,9 +65,9 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
 
-        ImGui::Checkbox("Aim at NPC", &g.Aim_NPC);
-        ImGui::Checkbox("Aim at Team", &g.Aim_Team);
-        ImGui::Combo("AimBone", &g.Aim_Bone, AimBoneList, IM_ARRAYSIZE(AimBoneList));
+        ImGui::Checkbox("Aim at NPC", &g.g_Aim_NPC);
+        ImGui::Checkbox("Aim at Team", &g.g_Aim_Team);
+        ImGui::Combo("AimBone", &g.g_Aim_Bone, AimBoneList, IM_ARRAYSIZE(AimBoneList));
 
         ImGui::Spacing();
         ImGui::NewLine();
@@ -75,8 +75,8 @@ void CFramework::RenderMenu()
         ImGui::Text("FOV");
         ImGui::Separator();
         ImGui::Spacing();
-        ImGui::Checkbox("DrawFOV", &g.Aim_DrawFov);
-        ImGui::CustomSliderFloat("FOV", "##aim_fov", &g.Aim_Fov, 50.f, 1000.f);
+        ImGui::Checkbox("DrawFOV", &g.g_Aim_DrawFov);
+        ImGui::CustomSliderFloat("FOV", "##aim_fov", &g.g_Aim_Fov, 50.f, 1000.f);
         ImGui::ColorEdit4("FOV Color", &FOV_User.Value.x);
         break;
     case 1: // visual
@@ -84,10 +84,10 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
 
-        ImGui::Checkbox("ESP", &g.ESP);
-        ImGui::Checkbox("Glow", &g.ESP_Glow);
-        ImGui::Checkbox("NPC ESP", &g.ESP_NPC);
-        ImGui::Checkbox("Team ESP", &g.ESP_Team);
+        ImGui::Checkbox("ESP", &g.g_ESP);
+        ImGui::Checkbox("Glow", &g.g_ESP_Glow);
+        ImGui::Checkbox("NPC ESP", &g.g_ESP_NPC);
+        ImGui::Checkbox("Team ESP", &g.g_ESP_Team);
 
         ImGui::NewLine();
         ImGui::Spacing();
@@ -96,18 +96,18 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
 
-        ImGui::Checkbox("Box", &g.ESP_Box);
-        ImGui::Checkbox("BoxFilled", &g.ESP_BoxFilled);
-        ImGui::Checkbox("Line", &g.ESP_Line);
-        ImGui::Checkbox("Name", &g.ESP_Name);
-        ImGui::Checkbox("Distance", &g.ESP_Distance);
-        ImGui::Checkbox("HealthBar", &g.ESP_HealthBar);
+        ImGui::Checkbox("Box", &g.g_ESP_Box);
+        ImGui::Checkbox("BoxFilled", &g.g_ESP_BoxFilled);
+        ImGui::Checkbox("Line", &g.g_ESP_Line);
+        ImGui::Checkbox("Name", &g.g_ESP_Name);
+        ImGui::Checkbox("Distance", &g.g_ESP_Distance);
+        ImGui::Checkbox("HealthBar", &g.g_ESP_HealthBar);
         break;
     case 2: // system
         ImGui::Text("System");
         ImGui::Separator();
         ImGui::Spacing();
-        ImGui::Checkbox("StreamProof", &g.StreamProof);
+        ImGui::Checkbox("StreamProof", &g.g_StreamProof);
 
         ImGui::Spacing();
         ImGui::NewLine();
@@ -116,10 +116,10 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
 
-        ImGui::Checkbox("Crosshair", &g.Crosshair);
-        ImGui::CustomSliderInt("CrosshairSize", "##SizeCH", &g.CrosshairSize, 1, 10);
+        ImGui::Checkbox("Crosshair", &g.g_Crosshair);
+        ImGui::CustomSliderInt("CrosshairSize", "##SizeCH", &g.g_CrosshairSize, 1, 10);
         ImGui::ColorEdit4("Color##C", &CrosshairColor.Value.x);
-        ImGui::Combo("Type##C", &g.CrosshairType, CrosshairList, IM_ARRAYSIZE(CrosshairList));
+        ImGui::Combo("Type##C", &g.g_CrosshairType, CrosshairList, IM_ARRAYSIZE(CrosshairList));
         break;
     default:
         break;
@@ -142,14 +142,14 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
         style.ItemSpacing.y = 3.f;
-        ImGui::CustomSliderFloat("FOV", "##aim_fov", &g.Aim_Fov, 50.f, 1000.f);
-        ImGui::CustomSliderFloat("Smooth", "##aim_smt", &g.Aim_Smooth, 1.f, 20.f);
-        ImGui::CustomSliderFloat("Distance", "##aim_dist", &g.Aim_MaxDistance, 50.f, 300.f);
+        ImGui::CustomSliderFloat("FOV", "##aim_fov", &g.g_Aim_Fov, 50.f, 1000.f);
+        ImGui::CustomSliderFloat("Smooth", "##aim_smt", &g.g_Aim_Smooth, 1.f, 20.f);
+        ImGui::CustomSliderFloat("Distance", "##aim_dist", &g.g_Aim_MaxDistance, 50.f, 300.f);
         style.ItemSpacing.y = DefaultSpacing;
         ImGui::Spacing();
         ImGui::Spacing();
-        ImGui::Combo("AimType", &g.Aim_Type, AimTypeList, IM_ARRAYSIZE(AimTypeList));
-        ImGui::Combo("AimMode", &g.Aim_Mode, AimModeList, IM_ARRAYSIZE(AimModeList));
+        ImGui::Combo("AimType", &g.g_Aim_Type, AimTypeList, IM_ARRAYSIZE(AimTypeList));
+        ImGui::Combo("AimMode", &g.g_Aim_Mode, AimModeList, IM_ARRAYSIZE(AimModeList));
 
         ImGui::Spacing();
         ImGui::NewLine();
@@ -159,20 +159,20 @@ void CFramework::RenderMenu()
         ImGui::Spacing();
 
         ImGui::Text("1st Key:");
-        if (ImGui::Button(BindingID == 1 ? "< Press Any Key >" : KeyNames[g.AimKey0], ImVec2(215.f, 22.5f))) {
+        if (ImGui::Button(BindingID == 1 ? "< Press Any Key >" : KeyNames[g.g_AimKey0], ImVec2(215.f, 22.5f))) {
             BindingID = 1;
-            std::thread([&]() {KeyBinder(g.AimKey0, BindingID); }).detach();
+            std::thread([&]() { KeyBinder(g.g_AimKey0, BindingID); }).detach();
         }
 
         ImGui::PushItemWidth(215.f);
-        ImGui::Combo("##KeyMode", &g.AimKeyType, AimKeyTypeList, IM_ARRAYSIZE(AimKeyTypeList));
+        ImGui::Combo("##KeyMode", &g.g_AimKeyType, AimKeyTypeList, IM_ARRAYSIZE(AimKeyTypeList));
         ImGui::PopItemWidth();
         ImGui::Spacing();
 
         ImGui::Text("2nd Key:");
-        if (ImGui::Button(BindingID == 2 ? "< Press Any Key >" : KeyNames[g.AimKey1], ImVec2(215.f, 22.5f))) {
+        if (ImGui::Button(BindingID == 2 ? "< Press Any Key >" : KeyNames[g.g_AimKey1], ImVec2(215.f, 22.5f))) {
             BindingID = 2;
-            std::thread([&]() {KeyBinder(g.AimKey1, BindingID); }).detach();
+            std::thread([&]() { KeyBinder(g.g_AimKey1, BindingID); }).detach();
         }
         break;
     case 1: // visual
@@ -180,12 +180,12 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
 
-        ImGui::CustomSliderFloat("Distance", "##Dist", &g.ESP_MaxDistance, 100.f, 2000.f);
+        ImGui::CustomSliderFloat("Distance", "##Dist", &g.g_ESP_MaxDistance, 100.f, 2000.f);
 
         ImGui::Spacing();
         ImGui::Spacing();
 
-        ImGui::Combo("BoxType", &g.ESP_BoxType, BoxTypeList, IM_ARRAYSIZE(BoxTypeList));
+        ImGui::Combo("BoxType", &g.g_ESP_BoxType, BoxTypeList, IM_ARRAYSIZE(BoxTypeList));
 
         ImGui::NewLine();
         ImGui::Spacing();
@@ -210,7 +210,7 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
         if (ImGui::Button("Exit", ImVec2(ImGui::GetContentRegionAvail().x, 30.f)))
-            g.Run = false;
+            g.g_Run = false;
         break;
     default:
         break;

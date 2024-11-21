@@ -4,54 +4,54 @@
 struct Globals
 {
     // System
-    bool Run = true;
-    bool ShowMenu = false;
+    bool g_Run = true;
+    bool g_ShowMenu = false;
 
     // GameData
-    HWND GameHwnd;
-    RECT GameRect{};
-    POINT GamePoint{};
+    HWND g_GameHwnd;
+    RECT g_GameRect{};
+    POINT g_GamePoint{};
 
     // AimBot
-    bool AimBot   = true;
-    bool Aim_NPC  = false;
-    bool Aim_Team = false;
-    bool Aim_VisCheck   = true;
-    bool Aim_Prediction = true;
-    bool Aim_NoSway     = true;
-    bool Aim_DrawFov    = true;
-    float Aim_Fov = 150.f;
-    float Aim_Smooth = 1.f;
-    float Aim_MaxDistance = 150.f;
-    int Aim_Mode = 0; // Memory/Mouse
-    int Aim_Bone = 0; // Bone
-    int Aim_Type = 0; // FOV/Dist
-    int AimKeyType = 1; // and/or
+    bool g_AimBot   = true;
+    bool g_Aim_NPC  = false;
+    bool g_Aim_Team = false;
+    bool g_Aim_VisCheck   = true;
+    bool g_Aim_Prediction = true;
+    bool g_Aim_NoSway     = true;
+    bool g_Aim_DrawFov    = true;
+    float g_Aim_Fov = 150.f;
+    float g_Aim_Smooth = 1.f;
+    float g_Aim_MaxDistance = 150.f;
+    int g_Aim_Mode = 0;   // Memory/Mouse
+    int g_Aim_Bone = 0;   // Bone
+    int g_Aim_Type = 0;   // FOV/Dist
+    int g_AimKeyType = 1; // and/or
 
     // Visual
-    bool ESP      = true;
-    bool ESP_Glow = false;
-    bool ESP_NPC  = false;
-    bool ESP_Team = false;
-    bool ESP_Box = true;
-    bool ESP_BoxFilled = false;
-    bool ESP_Line      = false;
-    bool ESP_Name      = true;
-    bool ESP_Distance  = true;
-    bool ESP_HealthBar = true;
-    int ESP_BoxType = 1;
-    float ESP_MaxDistance = 500.f;
+    bool g_ESP      = true;
+    bool g_ESP_Glow = false;
+    bool g_ESP_NPC  = false;
+    bool g_ESP_Team = false;
+    bool g_ESP_Box  = true;
+    bool g_ESP_BoxFilled = false;
+    bool g_ESP_Line      = false;
+    bool g_ESP_Name      = true;
+    bool g_ESP_Distance  = true;
+    bool g_ESP_HealthBar = true;
+    int g_ESP_BoxType    = 1;
+    float g_ESP_MaxDistance = 500.f;
    
     // System
-    bool StreamProof = false;
-    bool Crosshair = false;
-    int CrosshairSize = 3;
-    int CrosshairType = 0;
+    bool g_StreamProof = false;
+    bool g_Crosshair = false;
+    int g_CrosshairSize = 3;
+    int g_CrosshairType = 0;
 
     // Key
-    int MenuKey = VK_END;
-    int AimKey0 = VK_RBUTTON;
-    int AimKey1 = VK_LBUTTON;
+    int g_MenuKey = VK_END;
+    int g_AimKey0 = VK_RBUTTON;
+    int g_AimKey1 = VK_LBUTTON;
 };
 
 extern Globals g;

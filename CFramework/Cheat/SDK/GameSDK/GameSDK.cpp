@@ -2,7 +2,7 @@
 
 bool Vec3_Empty(const Vector3& value)
 {
-    return value == Vector3(0.f, 0.f, 0.f);
+    return value == Vector3();
 }
 
 void NormalizeAngles(Vector3& angle)
