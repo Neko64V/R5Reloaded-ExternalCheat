@@ -6,7 +6,7 @@ R5Reloadedの外部チートです。チート開発に対する興味を失っ�
 * AIMBOT
 * ESP
 * 観戦者リスト
-* MenuKey : END
+* MenuKey : Insert
 
 ## 備考
 * メニューにImGuiを採用、ESP等のレンダリングもImGuiのDrawListを使用。
@@ -27,8 +27,6 @@ https://learn.microsoft.com/ja-jp/cpp/build/vscpp-step-0-installation?view=msvc-
 https://github.com/microsoft/DirectXTK  
 * ImGui  
 https://github.com/ocornut/imgui  
-* FreeType  
-https://github.com/freetype/freetype  
 
 ## 写真
 ![AIM](https://github.com/user-attachments/assets/37da052f-b8b1-4072-b6a2-c7bbd2fd3647)
