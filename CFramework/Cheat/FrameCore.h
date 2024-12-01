@@ -9,6 +9,7 @@ class CFramework
 {
 public:
     void UpdateList();
+    void MiscAll();
     bool AimBot(CEntity& target);
 
 	void RenderInfo();
@@ -17,7 +18,10 @@ public:
 private:
     CEntity local;
     std::vector<CEntity> EntityList;
-    std::vector<std::string> SpectatorList;
+    std::vector<std::string> SpectatorPlayerName;
+
+
+    ImColor SetESPColor(bool& is_visible, bool is_team);
 
     // Colors
     ImColor ESP_Default  = { 1.f, 1.f, 1.f, 1.f };
@@ -62,11 +66,11 @@ private:
     }
     void String(ImVec2 pos, ImColor color, const char* text)
     {
-        ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(), pos, color, text, text + strlen(text), 128, 0);
+        ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(), pos, color, text, text + strlen(text), 1024, 0);
     }
     void StringEx(ImVec2 pos, ImColor color, float font_size, const char* text)
     {
-        ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), font_size, ImVec2(pos.x + 1.f, pos.y + 1.f), ImColor(0.f, 0.f, 0.f, 1.f), text, text + strlen(text), 128, 0);
-        ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), font_size, pos, color, text, text + strlen(text), 128, 0);
+        ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), font_size, ImVec2(pos.x + 1.f, pos.y + 1.f), ImColor(0.f, 0.f, 0.f, 1.f), text, text + strlen(text), 1024, 0);
+        ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), font_size, pos, color, text, text + strlen(text), 1024, 0);
     }
 };

@@ -19,6 +19,7 @@ namespace offset
 	const uintptr_t m_iTeamNum			= 0x3F0;
 	const uintptr_t m_localAngle		= 0x428;
 	const uintptr_t m_iMaxHealth		= 0x510;
+	const uintptr_t m_iSignifierName	= 0x518;
 	const uintptr_t m_lifeState			= 0x730;
 	const uintptr_t camera_origin		= 0x1b68;
 	const uintptr_t m_lastvisibletime	= 0x1754;

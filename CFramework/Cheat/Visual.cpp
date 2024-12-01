@@ -2,12 +2,6 @@
 
 void CFramework::RenderInfo()
 {
-    // ウォーターマーク
-    std::string text = "R5Reloaded";
-    StringEx(ImVec2(8.f, 8.f), ImColor(1.f, 1.f, 1.f, 1.f), ImGui::GetFontSize(), text.c_str());
-
-    ImGui::GetStyle().AntiAliasedLines = false;
-
     // FovCircle
     if (g.g_AimBot && g.g_Aim_DrawFov)
         ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(g.g_GameRect.right / 2.f, g.g_GameRect.bottom / 2.f), g.g_Aim_Fov, FOV_User);
@@ -29,7 +23,22 @@ void CFramework::RenderInfo()
         }
     }
 
-    ImGui::GetStyle().AntiAliasedLines = true;
+    // SpectatorList
+    if (g.g_SpectatorList)
+    {
+        ImGui::SetNextWindowBgAlpha(SpectatorPlayerName.size() > 0 ? 0.9f : 0.35f);
+        ImGui::SetNextWindowPos(ImVec2(12.f, 16.f));
+        ImGui::SetNextWindowSize(ImVec2(250.f, 125.f));
+        std::string title = "Spectator [" + std::to_string(SpectatorPlayerName.size()) + "]";
+        ImGui::Begin(title.c_str(), &g.g_ShowMenu, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+        std::vector<std::string> spec_list = SpectatorPlayerName;
+
+        for (auto& name : spec_list)
+            ImGui::Text(name.c_str());
+
+        ImGui::End();
+    }
 }
 
 void CFramework::RenderESP()
@@ -52,56 +61,54 @@ void CFramework::RenderESP()
     Matrix ViewMatrix = m.Read<Matrix>(m.Read<uintptr_t>(ViewRenderer + offset::ViewMatrix));
 
     // るーぷするよ
-    for (auto& entity : EntityList) 
+    for (auto& entity : EntityList)
     {
         CEntity* pEntity = &entity;
 
-        if (pEntity->IsSpectator()) {
-            SpectatorList.push_back(pEntity->GetName());
-            continue;
-        }
-        else if (!g.g_ESP_NPC && !pEntity->IsPlayer()) {
-            continue;
-        }
-        
         if (!pEntity->Update())
             continue;
 
         // 距離を取得
-        float pDistance = ((pLocal->m_localOrigin - pEntity->m_localOrigin).Length() * 0.01905f);
+        const float pDistance = ((pLocal->m_localOrigin - pEntity->m_localOrigin).Length() * 0.01905f);
 
+        // 各種チェック
         if (g.g_ESP_MaxDistance < pDistance)
             continue;
         else if (!g.g_ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
             continue;
 
-        // 頭とベース位置の座標(3D/2D)を取得
+        // 頭とベース位置の座標(3D/2D)を取得 - Bone to Neckを出せばいい
         Vector2 pBase{}, pHead{};
-        Vector3 Head = pEntity->GetEntityBonePosition(8) + Vector3(0.f, 0.f, 12.f);
+        const Vector3 Head = pEntity->GetEntityBonePosition(8) + Vector3(0.f, 0.f, 12.f);
         if (!WorldToScreen(ViewMatrix, g.g_GameRect, pEntity->m_localOrigin + Vector3(0.f, 0.f, -6.f), pBase) || !WorldToScreen(ViewMatrix, g.g_GameRect, Head, pHead))
             continue;
 
         // ESP Box等のサイズ算出
-        float Height = abs(abs(pHead.y) - abs(pBase.y));
-        float Width = Height / 2.f;
-        float bScale = Width / 1.5f;
-    
-        /* 対象が見えてるかチェックするよ。
+        const float Height = pBase.y - pHead.y;
+        const float Width = Height / 2.f;
+        const float bScale = Width / 1.5f;
+
+        /*
+        対象が見えてるかチェックするよ。
         前のループで取得したLastVisibleTimeを保存しておくよりも安定する。
-        ただし、Ping値による影響があるかどうかを確認する必要がある。 */
+        ただし、Ping値による影響があるかどうかを確認する必要がある。
+        */
         bool visible = pEntity->m_lastvisibletime + 0.1f >= pLocal->GetTimeBase();
 
         // ESPの色を決める
-        ImColor color = visible ? ESP_Visible : ESP_Default;
+        ImColor color = SetESPColor(visible, pEntity->m_iTeamNum == pLocal->m_iTeamNum ? true : false);
 
-        if (g.g_ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
-            color = ESP_Team;
+        // Glow
+        if (g.g_ESP_Glow)
+            pEntity->EnableGlow(GlowColor{ color.Value.x, color.Value.y, color.Value.z }, GlowMode{ 101, 6, 85, 96 });
+        else if (!g.g_ESP_Glow && m.Read<int>(pEntity->entity + 0x310) != 0)
+            pEntity->DisableGlow();
 
-        // LINE
+        // Line
         if (g.g_ESP_Line)
             DrawLine(ImVec2((float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom), ImVec2(pBase.x, pBase.y), color, 1.f);
 
-        // BOX
+        // Box
         if (g.g_ESP_Box)
         {
             // BOX FILLED
@@ -132,31 +139,24 @@ void CFramework::RenderESP()
         // Healthbar
         if (g.g_ESP_HealthBar)
         {
+            // Health
             HealthBar(((pBase.x - bScale) - 4.f), pBase.y, 2, -Height, pEntity->m_iHealth, pEntity->m_iMaxHealth);
 
+            // Armor
             if (pEntity->m_shieldHealth > 0)
                 ArmorBar((pBase.x + bScale) + 3.f, pBase.y, 2, -Height, pEntity->m_shieldHealth, pEntity->m_shieldHealthMax);
         }
 
         // Distance
         if (g.g_ESP_Distance) {
-            std::string DistStr = std::to_string((int)pDistance) + "m";
+            const std::string DistStr = std::to_string((int)pDistance) + "m";
             String(ImVec2(pBase.x - (ImGui::CalcTextSize(DistStr.c_str()).x / 2.f), pBase.y + 1.f), ImColor(1.f, 1.f, 1.f, 1.f), DistStr.c_str());
         }
 
         // Name
         if (g.g_ESP_Name) {
-            std::string pName = pEntity->IsPlayer() ? pEntity->GetName() : "NPC"; // プレイヤーかダミーかの判定
+            const std::string pName = pEntity->IsPlayer() ? pEntity->GetName() : "NPC";
             String(ImVec2(pBase.x - (ImGui::CalcTextSize(pName.c_str()).x / 2.f), pHead.y -14.f), ImColor(1.f, 1.f, 1.f, 1.f), pName.c_str());
-        }
-
-        // Glow
-        if (g.g_ESP_Glow) {
-            pEntity->SetGlow(GlowColor{ color.Value.x, color.Value.y, color.Value.z }, GlowMode{ 101, 6, 85, 96 });
-        }
-        else if (!g.g_ESP_Glow && m.Read<int>(pEntity->entity + 0x310) != 0) {
-            m.Write<int>(pEntity->entity + 0x310, 0);
-            m.Write<int>(pEntity->entity + 0x320, 0);
         }
 
         // AimBot
@@ -178,7 +178,7 @@ void CFramework::RenderESP()
                 if (Vec3_Empty(CheckBone) || CheckBone == pEntity->m_localOrigin)
                     continue;
 
-                // 弱者男性なのでこうやるしかない。StudioHDRでHitBox取得してもいいけど気力がない
+                // 弱者男性なのでこうやるしかない。StudioHDRでHitBox取得してもいいけどもう気力がない
                 float B2B = (pEntity->m_localOrigin - CheckBone).Length() * 0.01905f;
 
                 if (B2B > 2.f)

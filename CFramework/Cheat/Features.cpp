@@ -1,5 +1,12 @@
 #include "FrameCore.h"
 
+const int ReadCount = 15000;
+
+struct CEntityListBase
+{
+    uintptr_t address[ReadCount]{};
+};
+
 Vector3 GetPredict(CEntity& target , float dist)
 {
     Vector3 vOut{};
@@ -9,6 +16,11 @@ Vector3 GetPredict(CEntity& target , float dist)
     vOut.z = (150.f * 0.5f * (bulletTime * bulletTime));
 
     return vOut;
+}
+
+void CFramework::MiscAll()
+{
+
 }
 
 bool CFramework::AimBot(CEntity& target)
@@ -108,33 +120,83 @@ void CFramework::UpdateList()
 {
     while (g.g_Run)
     {
-        // GetLocal
-        uintptr_t lp = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwLocalPlayer);
-        if (!local.GetEntity(lp)) {
-            Sleep(10);
+        std::vector<CEntity> ent_list;
+        std::vector<std::string> spec_list;
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+        // Local
+        local.entity = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwLocalPlayer);
+
+        if (local.entity == NULL)
             continue;
-        }
 
-        std::vector<CEntity> templist;
+        // EntityList
+        auto list_addr = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwEntityList);
 
-        for (int i = 0; i < 15000; i++)
+        if (list_addr == NULL)
+            continue;
+
+        // GetEntitys(20000)
+        auto list = m.Read< CEntityListBase>(m.m_gBaseAddress + offset::dwEntityList);
+
+        for (int i = 0; i < ReadCount; i++)
         {
-            CEntity entity{};
-            uintptr_t address = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwEntityList + (i * 0x20));
+            // Pointer Check
+            if (list.address[i] != NULL && list.address[i] != local.entity)
+            {
+                // Player/Item/Bot Check
+                char SignifierName[32]{};
+                const uintptr_t sig_name_addr = m.Read<uintptr_t>(list.address[i] + offset::m_iSignifierName);
+                
+                if (sig_name_addr != NULL)
+                {
+                    m.ReadString(sig_name_addr, SignifierName, sizeof(SignifierName));
 
-            if (address == NULL || address == lp)
-                continue;  
-            else if (!entity.GetEntity(address))
-                continue;   
-            else if (!entity.Update())
-                continue;
+                    if (strcmp(SignifierName, "player") == 0 || g.g_ESP_NPC && strcmp(SignifierName, "npc_dummie") == 0)
+                    {
+                        // Player/Dummy
+                        CEntity p = CEntity();
+                        p.entity = list.address[i];
+                        p.m_iSignifierName = SignifierName;
+                        
+                        // SpectatorCheck
+                        if (strcmp(SignifierName, "player") == 0 && m.Read<int>(list.address[i] + offset::m_iObserverMode) == 5)
+                            spec_list.push_back(p.GetName());
+                        else 
+                            ent_list.push_back(p);
+                    }
 
-            templist.push_back(entity);
+                    // Work in progress...
+                    /*
+                    else if (strcmp(iName, "viewmodel") == 0)
+                        temp_list.push_back(list.address[i]);
+                    else if (strcmp(iName, "prop_survival") == 0)
+                        temp_list.push_back(list.address[i]);
+                    */
+                    /* - Note
+                       player
+                       npc_dummie
+                       weaponx
+                       viewmodel
+                       prop_survival
+                       prop_dynamic
+                   */
+                }                
+            }
         }
 
-        EntityList = templist;
-        templist.clear();
-
-        Sleep(500);
+        EntityList = ent_list;
+        SpectatorPlayerName = spec_list;
+        ent_list.clear();
+        spec_list.clear();
     }
+}
+
+// :(
+ImColor CFramework::SetESPColor(bool& is_visible, bool is_team)
+{
+    if (is_team)
+        return ESP_Team;
+    
+    return is_visible ? ESP_Visible : ESP_Default;
 }

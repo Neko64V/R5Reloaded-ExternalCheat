@@ -43,6 +43,7 @@ struct Globals
     float g_ESP_MaxDistance = 500.f;
    
     // System
+    bool g_SpectatorList = true;
     bool g_StreamProof = false;
     bool g_Crosshair = false;
     int g_CrosshairSize = 3;

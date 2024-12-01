@@ -51,13 +51,13 @@ void Overlay::OverlayLoop()
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		if (g.g_ShowMenu)
-			cx->RenderMenu();
-
 		cx->RenderInfo();
 
 		if (g.g_ESP)
 			cx->RenderESP();
+
+		if (g.g_ShowMenu)
+			cx->RenderMenu();
 
 		ImGui::Render();
 		static const float clear_color_with_alpha[4] = { 0.f, 0.f, 0.f, 0.f };

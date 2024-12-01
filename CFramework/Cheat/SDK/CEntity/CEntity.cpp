@@ -1,11 +1,5 @@
 #include "CEntity.h"
 
-bool CEntity::GetEntity(uintptr_t& address)
-{
-	entity = address;
-	return entity == NULL ? false : true;
-}
-
 bool CEntity::Update()
 {
 	m_localOrigin	  = m.Read<Vector3>(entity + offset::m_localOrigin);
@@ -31,12 +25,12 @@ bool CEntity::Update()
 
 bool CEntity::IsPlayer()
 {
-	return GetSignifierName() == "player";
+	return m_iSignifierName == "player";
 }
 
 bool CEntity::IsSpectator()
 {
-	return m.Read<int>(entity + offset::m_iObserverMode) == 5;
+	return m_iObserverMode == 5;
 }
 
 float CEntity::GetTimeBase()
@@ -44,12 +38,18 @@ float CEntity::GetTimeBase()
 	return m.Read<float>(entity + 0x1D18);
 }
 
-void CEntity::SetGlow(GlowColor color, GlowMode mode)
+void CEntity::EnableGlow(GlowColor color, GlowMode mode)
 {
 	m.Write<int>(entity + 0x310, 1);
 	m.Write<int>(entity + 0x320, 2);
 	m.Write<GlowMode>(entity + 0x27C, mode);
 	m.Write<GlowColor>(entity + 0x1D0, color);
+}
+
+void CEntity::DisableGlow()
+{
+	m.Write<int>(entity + 0x310, 0);
+	m.Write<int>(entity + 0x320, 0);
 }
 
 std::string CEntity::GetName()
@@ -59,14 +59,6 @@ std::string CEntity::GetName()
 	m.ReadString(NameAddress, pName, sizeof(pName));
 
 	return pName;
-}
-
-std::string CEntity::GetSignifierName()
-{
-	char iName[16]{};
-	m.ReadString(entity + 0x521, iName, sizeof(iName));
-
-	return iName;
 }
 
 Vector3 CEntity::GetEntityBonePosition(int BoneId)
