@@ -20,7 +20,6 @@ private:
     std::vector<CEntity> EntityList;
     std::vector<std::string> SpectatorPlayerName;
 
-
     ImColor SetESPColor(bool& is_visible, bool is_team);
 
     // Colors

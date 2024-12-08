@@ -20,7 +20,7 @@ Vector3 GetPredict(CEntity& target , float dist)
 
 void CFramework::MiscAll()
 {
-
+    // NoRecoil‚ð‚Í‚¶‚ß‚Æ‚µ‚½”CˆÓ‚Ì‹@”\‚ð’Ç‰Á‚µ‚Ä‚Ë
 }
 
 bool CFramework::AimBot(CEntity& target)
