@@ -12,13 +12,9 @@ bool CEntity::Update()
 	m_shieldHealth	  = m.Read<int>(entity + offset::m_shieldHealth);
 	m_shieldHealthMax = m.Read<int>(entity + offset::m_shieldHealthMax);
 	m_iTeamNum		  = m.Read<int>(entity + offset::m_iTeamNum);
-	m_localAngle	  = m.Read<Vector3>(entity + offset::m_localAngle);
 	m_iMaxHealth	  = m.Read<int>(entity + offset::m_iMaxHealth);
-	m_lifeState		  = m.Read<int>(entity + offset::m_lifeState);
 	m_lastvisibletime = m.Read<float>(entity + offset::m_lastvisibletime);
 	camera_origin	  = m.Read<Vector3>(entity + offset::camera_origin);
-	m_SwayAngle		  = m.Read<Vector3>(entity + offset::m_SwayAngle);
-	m_ViewAngle		  = m.Read<Vector3>(entity + offset::m_ViewAngle);
 
 	return true;
 }
@@ -31,6 +27,31 @@ bool CEntity::IsPlayer()
 bool CEntity::IsSpectator()
 {
 	return m_iObserverMode == 5;
+}
+
+int CEntity::GetLifeState()
+{
+	return m.Read<int>(entity + offset::m_lifeState);
+}
+
+Vector3 CEntity::GetViewAngle()
+{
+	return m.Read<Vector3>(entity + offset::m_ViewAngle);
+}
+
+Vector3 CEntity::GetSwayAngle()
+{
+	return m.Read<Vector3>(entity + offset::m_SwayAngle);
+}
+
+Vector3 CEntity::GetPunchAngle()
+{
+	return m.Read<Vector3>(entity + offset::m_vecPunchAngle);
+}
+
+Vector3 CEntity::GetWeaponPunchAngle()
+{
+	return m.Read<Vector3>(entity + offset::m_vecPunchWeapon_Angle);
 }
 
 float CEntity::GetTimeBase()
