@@ -26,6 +26,12 @@ namespace offset
 	const uintptr_t m_vecPunchAngle		= 0x20bc;
 	const uintptr_t m_SwayAngle			= 0x2178;
 	const uintptr_t m_ViewAngle			= 0x2188;
+
+	const uintptr_t	m_vecPunchBase_Angle = 0x20a4;
+	const uintptr_t	m_vecPunchBase_AngleVel = 0x20b0;
+	const uintptr_t	m_vecPunchWeapon_Angle = 0x20bc;
+	const uintptr_t	m_vecPunchWeapon_AngleVel = 0x20c8;
+
 	const uintptr_t m_platformUserId	= 0x2220;
 	const uintptr_t m_iObserverMode		= 0x2fcc;
 	const uintptr_t m_hObserverTarget	= 0x2fd0;
