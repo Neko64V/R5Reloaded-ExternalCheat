@@ -46,6 +46,7 @@ void Overlay::OverlayLoop()
 
 		// オーバーレイウィンドウの位置やサイズ等のチェック
 		OverlayManager();
+		cx->MiscAll();
 
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();

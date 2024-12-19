@@ -1,0 +1,11 @@
+﻿  CEntity.cpp
+C:\Users\saway\Desktop\プロジェクト\_Cheat\R5Reloaded-ExternalCheat\CFramework\Cheat\SDK\GameSDK\GameSDK.h(63,15): warning C4091: 'extern ': 変数が何も宣言されていないときは、'Bone' の左辺を無視します。
+  (ソース ファイル 'Cheat/SDK/CEntity/CEntity.cpp' をコンパイルしています)
+  
+C:\Users\saway\Desktop\プロジェクト\_Cheat\R5Reloaded-ExternalCheat\CFramework\Cheat\SDK\GameSDK\GameSDK.h(64,15): warning C4091: 'extern ': 変数が何も宣言されていないときは、'GlowMode' の左辺を無視します。
+  (ソース ファイル 'Cheat/SDK/CEntity/CEntity.cpp' をコンパイルしています)
+  
+C:\Users\saway\Desktop\プロジェクト\_Cheat\R5Reloaded-ExternalCheat\CFramework\Cheat\SDK\GameSDK\GameSDK.h(65,15): warning C4091: 'extern ': 変数が何も宣言されていないときは、'GlowColor' の左辺を無視します。
+  (ソース ファイル 'Cheat/SDK/CEntity/CEntity.cpp' をコンパイルしています)
+  
+  CFramework.vcxproj -> C:\Users\saway\Desktop\プロジェクト\_Cheat\R5Reloaded-ExternalCheat\x64\Debug\CFramework.exe

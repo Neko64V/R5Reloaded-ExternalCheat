@@ -89,12 +89,12 @@ bool CFramework::AimBot(CEntity& target)
     if (g.g_Aim_Mode == 0)
     {
         Vector3 Angle = CalcAngle(pLocal->camera_origin, TargetBone);
-        Vector3 ViewAngle = pLocal->m_ViewAngle;
+        Vector3 ViewAngle = pLocal->GetViewAngle();
         Vector3 Delta = Angle - ViewAngle;
 
         if (g.g_Aim_NoSway)
         {
-            Vector3 Breath = pLocal->m_SwayAngle - ViewAngle;
+            Vector3 Breath = pLocal->GetSwayAngle() - ViewAngle;
 
             if (Breath.x != 0.f || Breath.y != 0.f)
                 Delta = (Angle - ViewAngle) - Breath;
@@ -195,8 +195,5 @@ void CFramework::UpdateList()
 // :(
 ImColor CFramework::SetESPColor(bool& is_visible, bool is_team)
 {
-    if (is_team)
-        return ESP_Team;
-    
-    return is_visible ? ESP_Visible : ESP_Default;
+    return is_team ? ESP_Team : (is_visible ? ESP_Visible : ESP_Default);
 }
