@@ -42,6 +42,10 @@ struct Globals
     int g_ESP_BoxType    = 1;
     float g_ESP_MaxDistance = 500.f;
    
+    // Misc
+    bool g_NoRecoil = false;
+    float g_NoRecoilVal = 1.f;
+
     // System
     bool g_SpectatorList = true;
     bool g_StreamProof = false;

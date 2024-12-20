@@ -7,7 +7,7 @@ const char* AimModeList[] = { "Memory", "Mouse" };
 const char* AimBoneList[] = { "Head", "Chest" };
 const char* AimKeyTypeList[] = { "and", "or" };
 const char* CrosshairList[] = { "Cross", "Circle" };
-std::vector<std::string> MenuSelectList = { "AimBot", "Visual", "System" };
+std::vector<std::string> MenuSelectList = { "AimBot", "Visual", "Misc", "System" };
 
 // チートのメニュー
 void CFramework::RenderMenu()
@@ -103,7 +103,14 @@ void CFramework::RenderMenu()
         ImGui::Checkbox("Distance", &g.g_ESP_Distance);
         ImGui::Checkbox("HealthBar", &g.g_ESP_HealthBar);
         break;
-    case 2: // system
+    case 2: // misc
+        ImGui::Text("NoRecoil");
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::Checkbox("NoReocil", &g.g_NoRecoil);
+        ImGui::CustomSliderFloat("Recoil percentage", "##recoilptg", &g.g_NoRecoilVal, 0.f, 1.f);
+        break;
+    case 3: // system
         ImGui::Text("System");
         ImGui::Separator();
         ImGui::Spacing();
@@ -205,7 +212,10 @@ void CFramework::RenderMenu()
         ImGui::BulletText("Sub Color");
         ImGui::ColorEdit4("BoxFilled", &ESP_Filled.Value.x);
         break;
-    case 2: // system
+    case 2: // misc
+
+        break;
+    case 3: // system
         ImGui::Text("Exit");
         ImGui::Separator();
         ImGui::Spacing();

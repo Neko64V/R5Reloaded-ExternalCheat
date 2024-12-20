@@ -26,7 +26,8 @@ void CFramework::RenderInfo()
     // SpectatorList
     if (g.g_SpectatorList)
     {
-        String(ImVec2(g.g_GameRect.right / 2.f - (ImGui::CalcTextSize("[ Spectator Found! ]").x), g.g_GameRect.top), ImColor(1.f, 0.f, 0.f, 1.f), "[ Spectator Found! ]");
+        if (SpectatorPlayerName.size() > 0)
+            String(ImVec2(g.g_GameRect.right / 2.f - (ImGui::CalcTextSize("[ Spectator Found! ]").x), g.g_GameRect.top), ImColor(1.f, 0.f, 0.f, 1.f), "[ Spectator Found! ]");
 
         ImGui::SetNextWindowBgAlpha(SpectatorPlayerName.size() > 0 ? 0.9f : 0.35f);
         ImGui::SetNextWindowPos(ImVec2(12.f, 16.f));

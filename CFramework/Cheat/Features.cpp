@@ -18,9 +18,32 @@ Vector3 GetPredict(CEntity& target , float dist)
     return vOut;
 }
 
+
+
 void CFramework::MiscAll()
 {
-    // NoRecoil‚ð‚Í‚¶‚ß‚Æ‚µ‚½”CˆÓ‚Ì‹@”\‚ð’Ç‰Á‚µ‚Ä‚Ë
+    CEntity* pLocal = &local;
+
+    if (!pLocal->Update())
+        return;
+
+    // NoRecoil
+    if (g.g_NoRecoil)
+    {
+        static Vector3 OldPunch{};
+
+        Vector3 PunchAngle = pLocal->GetWeaponPunchAngle();
+
+        if (!Vec3_Empty(PunchAngle)) {
+            Vector3 Delta = pLocal->GetViewAngle() + ((OldPunch - PunchAngle) * g.g_NoRecoilVal);
+            NormalizeAngles(Delta);
+
+            if (!Vec3_Empty(Delta))
+                m.Write<Vector3>(pLocal->entity + offset::m_ViewAngle, Delta);
+
+            OldPunch = PunchAngle;
+        }
+    }
 }
 
 bool CFramework::AimBot(CEntity& target)
