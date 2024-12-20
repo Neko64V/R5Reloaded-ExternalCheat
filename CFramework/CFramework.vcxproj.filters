@@ -163,5 +163,11 @@
     <None Include="Framework\Utils\SimpleMath\SimpleMath.inl">
       <Filter>Framework\Utils\SimpleMath</Filter>
     </None>
+    <None Include="..\README.md" />
+    <None Include="..\.gitignore" />
+    <None Include="..\LICENSE" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\dump.txt" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@ R5Reloaded用のシンプルな外部チートです。チート開発に対す�
 ## 機能
 * AIMBOT
 * ESP
+* NoRecoil
 * 観戦者リスト
 * MenuKey : Insert
 
