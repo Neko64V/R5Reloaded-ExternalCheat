@@ -11,15 +11,15 @@ int main()
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 #endif
 {
-	// Fix DPI Scale
-	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
-
-	// Apexのウィンドウをベースにして初期化を行う
-	if (!m.AttachProcess("Apex Legends", InitMode::WINDOW_TITLE)) // 詳細は Memory/Memory.h を参照
+	// プロセスに接続する
+	if (!m.AttachProcess("Apex Legends", InitializeMode::WINDOW_TITLE)) // 詳細は Framework/Utils/Memory/Memory.h を参照
 		return 1;
 
+	// ベースアドレスを取得する
+	m.GetBaseAddress("r5apex.exe");
+
 	// Overlay
-	if (!ov->InitOverlay("Apex Legends", InitMode::WINDOW_TITLE)) // MemoryInitModeと同様
+	if (!ov->InitOverlay("Apex Legends", InitializeMode::WINDOW_TITLE)) // MemoryInitModeと同様
 		return 2;
 
 	// スレッドを作成

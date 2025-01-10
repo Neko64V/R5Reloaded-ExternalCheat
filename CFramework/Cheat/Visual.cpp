@@ -60,7 +60,7 @@ void CFramework::RenderESP()
     Vector2 ScreenMiddle = { (float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom / 2.f };
 
     // ViewMatrixとかいろいろ
-    uintptr_t ViewRenderer = m.Read<uintptr_t>(m.m_gBaseAddress + offset::ViewRender);
+    uintptr_t ViewRenderer = m.Read<uintptr_t>(m.m_gProcessBaseAddr + offset::ViewRender);
     Matrix ViewMatrix = m.Read<Matrix>(m.Read<uintptr_t>(ViewRenderer + offset::ViewMatrix));
 
     // るーぷするよ
@@ -88,7 +88,7 @@ void CFramework::RenderESP()
         */
 
         // 方法2 - SourceEngineのみではあるが m_Collision を使用する方法
-        // Counter Strike: Sourceを触ってる時にこれApexにも応用できそうだなと思ってこうなりました。オフセット以外なんもいじってない
+        // Counter Strike: Source で使ってたコードを流用している
         Vector3 min = pEntity->vecMin();
         Vector3 max = pEntity->vecMax();
 
@@ -99,17 +99,11 @@ void CFramework::RenderESP()
                     Vector3(max.x, min.y, min.z), Vector3(max.x, max.y, max.z), Vector3(min.x, max.y, max.z),
                     Vector3(min.x, min.y, max.z), Vector3(max.x, min.y, max.z) };
 
-        Vector3 transformedPoints[8]{};
-
-        // FS_1v1等のモードだと正常に動かないので従来の方法を使うのが望ましいかもね
-        for (int i = 0; i < 8; i++) {
-            transformedPoints[i] = Vector3::TransformNormal(points[i], pEntity->GetRgflCoordinateFrame());
-        }
-
-        if (!WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[3], flb) || !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[5], brt) ||
-            !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[0], blb) || !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[4], frt) ||
-            !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[2], frb) || !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[1], brb) ||
-            !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[6], blt) || !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[7], flt))
+        // m_rgflCoordinateFrame は不要なのでこのままW2Sでよい
+        if (!WorldToScreen(ViewMatrix, g.g_GameRect, points[3], flb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[5], brt) ||
+            !WorldToScreen(ViewMatrix, g.g_GameRect, points[0], blb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[4], frt) ||
+            !WorldToScreen(ViewMatrix, g.g_GameRect, points[2], frb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[1], brb) ||
+            !WorldToScreen(ViewMatrix, g.g_GameRect, points[6], blt) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[7], flt))
             continue;
 
         Vector2 vec2_array[] = { flb, brt, blb, frt, frb, brb, blt, flt };
@@ -140,7 +134,7 @@ void CFramework::RenderESP()
         bool visible = pEntity->m_lastvisibletime + 0.125f >= pLocal->GetTimeBase();
 
         // 色を決める
-        ImColor color = visible ? ESP_Visible : (pLocal->m_iTeamNum == pEntity->m_iTeamNum ? ESP_Team : ESP_Default);
+        ImColor color = pLocal->m_iTeamNum == pEntity->m_iTeamNum ? ESP_Team : (visible ? ESP_Visible : ESP_Default);
 
         // Glow
         if (g.g_ESP_Glow)
@@ -163,10 +157,10 @@ void CFramework::RenderESP()
             {
             case 0:
                 // Shadow
-                DrawLine(Vector2(left - 1, top - 1), Vector2(right + 2, top - 1), ImColor(0.f, 0.f, 0.f, 1.f), 1.f);
-                DrawLine(Vector2(left - 1, top), Vector2(left - 1, bottom + 2), ImColor(0.f, 0.f, 0.f, 1.f), 1.f);
-                DrawLine(Vector2(right + 1, top), Vector2(right + 1, bottom + 2), ImColor(0.f, 0.f, 0.f, 1.f), 1.f);
-                DrawLine(Vector2(left - 1, bottom + 1), Vector2(right + 1, bottom + 1), ImColor(0.f, 0.f, 0.f, 1.f), 1.f);
+                DrawLine(Vector2(left - 1, top - 1), Vector2(right + 2, top - 1), ESP_Shadow, 1.f);
+                DrawLine(Vector2(left - 1, top), Vector2(left - 1, bottom + 2), ESP_Shadow, 1.f);
+                DrawLine(Vector2(right + 1, top), Vector2(right + 1, bottom + 2), ESP_Shadow, 1.f);
+                DrawLine(Vector2(left - 1, bottom + 1), Vector2(right + 1, bottom + 1), ESP_Shadow, 1.f);
 
                 // Main
                 DrawLine(Vector2(left, top), Vector2(right, top), color, 1.f);

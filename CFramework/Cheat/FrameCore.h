@@ -23,10 +23,12 @@ private:
     ImColor SetESPColor(bool& is_visible, bool is_team);
 
     // Colors
-    ImColor ESP_Default  = { 1.f, 1.f, 1.f, 1.f };
-    ImColor ESP_Visible  = { 1.f, 0.f, 0.f, 1.f };
-    ImColor ESP_Team     = { 0.f, 1.f, 1.f, 1.f };
+    ImColor ESP_Default = { 1.f, 1.f, 1.f, 1.f };
+    ImColor ESP_Visible = { 1.f, 0.f, 0.f, 1.f };
+    ImColor ESP_Team    = { 0.f, 1.f, 1.f, 1.f };
     ImColor ESP_Filled  = { 0.f, 0.f, 0.f, 0.2f };
+    ImColor ESP_Shadow  = { 0.f, 0.f, 0.f, 0.3f };
+
     ImColor FOV_User = { 1.f, 1.f, 1.f, 1.f };
     ImColor CrosshairColor = { 0.f, 1.f, 0.f, 1.f };
 

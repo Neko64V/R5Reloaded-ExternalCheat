@@ -1,21 +1,86 @@
 #include "FrameCore.h"
+#pragma comment(lib, "WinMM.lib")
 
 const int ReadCount = 15000;
+Vector3 GetPredict(CEntity& target, float dist);
+
+struct Entity
+{
+    uint64_t address;
+    uint64_t junk[3];
+};
 
 struct CEntityListBase
 {
-    uintptr_t address[ReadCount]{};
+    Entity entity[ReadCount]{};
 };
 
-Vector3 GetPredict(CEntity& target , float dist)
+/*
+    [ 概要 ]
+    ESPで表示したいEntityのみをここで抽出することでESPのパフォーマンスを劇的に改善できる。
+    レンダリングを行うスレッドで数千回以上のReadProcessMemoryからのcontinue;をするだけでかなりのロスなのでそれが回避できる功績は大きい。
+*/
+void CFramework::UpdateList() // C6262 :(
 {
-    Vector3 vOut{};
-    float bulletTime = dist / 650.f;
-    vOut.x = target.m_vecAbsVelocity.x * bulletTime;
-    vOut.y = target.m_vecAbsVelocity.y * bulletTime;
-    vOut.z = (150.f * 0.5f * (bulletTime * bulletTime));
+    while (g.g_Run)
+    {
+        std::vector<CEntity> ent_list;
+        std::vector<std::string> spec_list;
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-    return vOut;
+        // Local
+        pLocal->address = m.Read<uintptr_t>(m.m_gProcessBaseAddr + offset::dwLocalPlayer);
+
+        if (pLocal->address == NULL)
+            continue;
+
+        // EntityList
+        auto list_addr = m.Read<uintptr_t>(m.m_gProcessBaseAddr + offset::dwEntityList);
+
+        if (list_addr == NULL)
+            continue;
+
+        // GetEntitys(20000)
+        auto list = m.Read<CEntityListBase>(m.m_gProcessBaseAddr + offset::dwEntityList);
+
+        for (int i = 0; i < ReadCount; i++)
+        {
+            // Pointer Check
+            if (list.entity[i].address != NULL && list.entity[i].address != local.address)
+            {
+                // Player/Item/Bot Check
+                char SignifierName[32]{};
+                const uintptr_t sig_name_addr = m.Read<uintptr_t>(list.entity[i].address + offset::m_iSignifierName);
+
+                if (sig_name_addr != NULL)
+                {
+                    m.ReadString(sig_name_addr, SignifierName, sizeof(SignifierName));
+
+                    if (strcmp(SignifierName, "player") == 0 || g.g_ESP_NPC && strcmp(SignifierName, "npc_dummie") == 0)
+                    {
+                        // Player/Dummy
+                        CEntity p = CEntity();
+                        p.address = list.entity[i].address;
+                        p.m_iSignifierName = SignifierName;
+
+                        // SpectatorCheck
+                        if (strcmp(SignifierName, "player") == 0 && m.Read<int>(list.entity[i].address + offset::m_iObserverMode) == 5)
+                            spec_list.push_back(p.GetName());
+                        else {
+                            // 静的なデータ (== 名前等) をここであらかじめ取得しておく
+                            p.pName = p.GetName();
+                            ent_list.push_back(p);
+                        }
+                    }
+                }
+            }
+        }
+
+        EntityList = ent_list;
+        SpectatorPlayerName = spec_list;
+        ent_list.clear();
+        spec_list.clear();
+    }
 }
 
 void CFramework::MiscAll()
@@ -42,17 +107,19 @@ void CFramework::MiscAll()
     }
 
     // bHop
-    if (g.g_BunnyHop )
+    if (g.g_BunnyHop)
     {
         if (GetAsyncKeyState(VK_SPACE))
         {
             int flag = pLocal->GetFlag();
 
             if (flag != 64) {
-                m.Write<uint32_t>(m.m_gBaseAddress + offset::in_jump + 0x8, 5);
-                m.Write<uint32_t>(m.m_gBaseAddress + offset::in_jump + 0x8, 4);
+                m.Write<uint32_t>(m.m_gProcessBaseAddr + offset::in_jump + 0x8, 5);
+                timeBeginPeriod(1); // タイマー解像度を1msに設定
+                Sleep(1);          // 10msスリープ
+                timeEndPeriod(1);   // タイマー解像度を元に戻す
+                m.Write<uint32_t>(m.m_gProcessBaseAddr + offset::in_jump + 0x8, 4);
             }
-
         }
     }
 }
@@ -95,7 +162,7 @@ bool CFramework::AimBot(CEntity& target)
 
     Vector2 ScreenMiddle = { (float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom / 2.f };
     int AimBone = 8;
-    uintptr_t ViewRenderer = m.Read<uintptr_t>(m.m_gBaseAddress + offset::ViewRender);
+    uintptr_t ViewRenderer = m.Read<uintptr_t>(m.m_gProcessBaseAddr + offset::ViewRender);
     Matrix ViewMatrix = m.Read<Matrix>(m.Read<uintptr_t>(ViewRenderer + offset::ViewMatrix));
 
     // Set
@@ -150,70 +217,19 @@ bool CFramework::AimBot(CEntity& target)
     }
 }
 
-void CFramework::UpdateList()
-{
-    while (g.g_Run)
-    {
-        std::vector<CEntity> ent_list;
-        std::vector<std::string> spec_list;
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-        // Local
-        pLocal->address = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwLocalPlayer);
-
-        if (pLocal->address == NULL)
-            continue;
-
-        // EntityList
-        auto list_addr = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwEntityList);
-
-        if (list_addr == NULL)
-            continue;
-
-        // GetEntitys(20000)
-        auto list = m.Read<CEntityListBase>(m.m_gBaseAddress + offset::dwEntityList);
-
-        for (int i = 0; i < ReadCount; i++)
-        {
-            // Pointer Check
-            if (list.address[i] != NULL && list.address[i] != local.address)
-            {
-                // Player/Item/Bot Check
-                char SignifierName[32]{};
-                const uintptr_t sig_name_addr = m.Read<uintptr_t>(list.address[i] + offset::m_iSignifierName);
-                
-                if (sig_name_addr != NULL)
-                {
-                    m.ReadString(sig_name_addr, SignifierName, sizeof(SignifierName));
-
-                    if (strcmp(SignifierName, "player") == 0 || g.g_ESP_NPC && strcmp(SignifierName, "npc_dummie") == 0)
-                    {
-                        // Player/Dummy
-                        CEntity p = CEntity();
-                        p.address = list.address[i];
-                        p.m_iSignifierName = SignifierName;
-                        
-                        // SpectatorCheck
-                        if (strcmp(SignifierName, "player") == 0 && m.Read<int>(list.address[i] + offset::m_iObserverMode) == 5)
-                            spec_list.push_back(p.GetName());
-                        else {
-                            p.pName = p.GetName();
-                            ent_list.push_back(p);
-                        }  
-                    }
-                }                
-            }
-        }
-
-        EntityList = ent_list;
-        SpectatorPlayerName = spec_list;
-        ent_list.clear();
-        spec_list.clear();
-    }
-}
-
 // :(
 ImColor CFramework::SetESPColor(bool& is_visible, bool is_team)
 {
     return is_team ? ESP_Team : (is_visible ? ESP_Visible : ESP_Default);
+}
+
+Vector3 GetPredict(CEntity& target, float dist)
+{
+    Vector3 vOut{};
+    float bulletTime = dist / 650.f;
+    vOut.x = target.m_vecAbsVelocity.x * bulletTime;
+    vOut.y = target.m_vecAbsVelocity.y * bulletTime;
+    vOut.z = (150.f * 0.5f * (bulletTime * bulletTime));
+
+    return vOut;
 }

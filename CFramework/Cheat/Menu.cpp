@@ -104,6 +104,9 @@ void CFramework::RenderMenu()
         ImGui::Checkbox("HealthBar", &g.g_ESP_HealthBar);
         break;
     case 2: // misc
+        ImGui::Text("Misc");
+        ImGui::Separator();
+        ImGui::Spacing();
         ImGui::Checkbox("BunnyHop", &g.g_BunnyHop);
 
         ImGui::NewLine();
