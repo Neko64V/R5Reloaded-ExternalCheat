@@ -144,7 +144,6 @@
     <ClCompile Include="Cheat\Visual.cpp" />
     <ClCompile Include="Framework\ImGui\Custom.cpp" />
     <ClCompile Include="Framework\ImGui\imgui.cpp" />
-    <ClCompile Include="Framework\ImGui\imgui_demo.cpp" />
     <ClCompile Include="Framework\ImGui\imgui_draw.cpp" />
     <ClCompile Include="Framework\ImGui\imgui_impl_dx11.cpp" />
     <ClCompile Include="Framework\ImGui\imgui_impl_win32.cpp" />
