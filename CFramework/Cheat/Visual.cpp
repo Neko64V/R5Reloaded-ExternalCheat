@@ -27,7 +27,7 @@ void CFramework::RenderInfo()
     if (g.g_SpectatorList)
     {
         if (SpectatorPlayerName.size() > 0)
-            String(ImVec2(g.g_GameRect.right / 2.f - (ImGui::CalcTextSize("[ Spectator Found! ]").x), g.g_GameRect.top), ImColor(1.f, 0.f, 0.f, 1.f), "[ Spectator Found! ]");
+            String(Vector2(g.g_GameRect.right / 2 - (ImGui::CalcTextSize("[ Spectator Found! ]").x), g.g_GameRect.top), ImColor(1.f, 0.f, 0.f, 1.f), "[ Spectator Found! ]");
 
         ImGui::SetNextWindowBgAlpha(SpectatorPlayerName.size() > 0 ? 0.9f : 0.35f);
         ImGui::SetNextWindowPos(ImVec2(12.f, 16.f));
@@ -72,7 +72,7 @@ void CFramework::RenderESP()
             continue;
 
         // 距離を取得
-        const float pDistance = ((pLocal->m_localOrigin - pEntity->m_localOrigin).Length() * 0.01905f);
+        const float pDistance = ((pLocal->m_vecAbsOrigin - pEntity->m_vecAbsOrigin).Length() * 0.01905f);
 
         // 各種チェック
         if (g.g_ESP_MaxDistance < pDistance)
@@ -80,61 +80,109 @@ void CFramework::RenderESP()
         else if (!g.g_ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
             continue;
 
-        // 頭とベース位置の座標(3D/2D)を取得 - Bone to Neckを出せばいい
+        /* // 方法1 - 頭とベース座標の位置をベースにする
         Vector2 pBase{}, pHead{};
         const Vector3 Head = pEntity->GetEntityBonePosition(8) + Vector3(0.f, 0.f, 12.f);
-        if (!WorldToScreen(ViewMatrix, g.g_GameRect, pEntity->m_localOrigin + Vector3(0.f, 0.f, -6.f), pBase) || !WorldToScreen(ViewMatrix, g.g_GameRect, Head, pHead))
+        if (!WorldToScreen(ViewMatrix, g.g_GameRect, pEntity->m_vecAbsOrigin + Vector3(0.f, 0.f, -6.f), pBase) || !WorldToScreen(ViewMatrix, g.g_GameRect, Head, pHead))
+            continue;
+        */
+
+        // 方法2 - SourceEngineのみではあるが m_Collision を使用する方法
+        // Counter Strike: Sourceを触ってる時にこれApexにも応用できそうだなと思ってこうなりました。オフセット以外なんもいじってない
+        Vector3 min = pEntity->vecMin();
+        Vector3 max = pEntity->vecMax();
+
+        int left, top, right, bottom;
+        Vector2 flb, brt, blb, frt, frb, brb, blt, flt;
+
+        Vector3 points[8] = { Vector3(min.x, min.y, min.z), Vector3(min.x, max.y, min.z), Vector3(max.x, max.y, min.z),
+                    Vector3(max.x, min.y, min.z), Vector3(max.x, max.y, max.z), Vector3(min.x, max.y, max.z),
+                    Vector3(min.x, min.y, max.z), Vector3(max.x, min.y, max.z) };
+
+        Vector3 transformedPoints[8]{};
+
+        // FS_1v1等のモードだと正常に動かないので従来の方法を使うのが望ましいかもね
+        for (int i = 0; i < 8; i++) {
+            transformedPoints[i] = Vector3::TransformNormal(points[i], pEntity->GetRgflCoordinateFrame());
+        }
+
+        if (!WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[3], flb) || !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[5], brt) ||
+            !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[0], blb) || !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[4], frt) ||
+            !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[2], frb) || !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[1], brb) ||
+            !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[6], blt) || !WorldToScreen(ViewMatrix, g.g_GameRect, transformedPoints[7], flt))
             continue;
 
-        // ESP Box等のサイズ算出
-        const float Height = pBase.y - pHead.y;
-        const float Width = Height / 2.f;
-        const float bScale = Width / 1.5f;
+        Vector2 vec2_array[] = { flb, brt, blb, frt, frb, brb, blt, flt };
+        left = flb.x;
+        top = flb.y;
+        right = flb.x;
+        bottom = flb.y;
 
-        /*
-        対象が見えてるかチェックするよ。
-        前のループで取得したLastVisibleTimeを保存しておくよりも安定する。
-        ただし、Ping値による影響があるかどうかを確認する必要がある。
-        */
-        bool visible = pEntity->m_lastvisibletime + 0.1f >= pLocal->GetTimeBase();
+        for (auto j = 1; j < 8; ++j)
+        {
+            if (left > vec2_array[j].x)
+                left = vec2_array[j].x;
+            if (bottom < vec2_array[j].y)
+                bottom = vec2_array[j].y;
+            if (right < vec2_array[j].x)
+                right = vec2_array[j].x;
+            if (top > vec2_array[j].y)
+                top = vec2_array[j].y;
+        }
 
-        // ESPの色を決める
-        ImColor color = SetESPColor(visible, pEntity->m_iTeamNum == pLocal->m_iTeamNum ? true : false);
+        // サイズ算出
+        const int Height = bottom - top;
+        const int Width = right - left;
+        const int Center = (right - left) / 2.f;
+        const int bScale = (right - left) / 3.f;
+
+        // 対象が見えてるかチェックする。
+        bool visible = pEntity->m_lastvisibletime + 0.125f >= pLocal->GetTimeBase();
+
+        // 色を決める
+        ImColor color = visible ? ESP_Visible : (pLocal->m_iTeamNum == pEntity->m_iTeamNum ? ESP_Team : ESP_Default);
 
         // Glow
         if (g.g_ESP_Glow)
             pEntity->EnableGlow(GlowColor{ color.Value.x, color.Value.y, color.Value.z }, GlowMode{ 101, 6, 85, 96 });
-        else if (!g.g_ESP_Glow && m.Read<int>(pEntity->entity + 0x310) != 0)
+        else if (!g.g_ESP_Glow && m.Read<int>(pEntity->address + 0x310) != 0)
             pEntity->DisableGlow();
 
         // Line
         if (g.g_ESP_Line)
-            DrawLine(ImVec2((float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom), ImVec2(pBase.x, pBase.y), color, 1.f);
+            DrawLine(Vector2(g.g_GameRect.right / 2.f, g.g_GameRect.bottom), Vector2(right - (Width / 2), bottom), color, 1.f);
 
         // Box
         if (g.g_ESP_Box)
         {
-            // BOX FILLED
+            // BoxFilled
             if (g.g_ESP_BoxFilled)
-                ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(pBase.x - bScale, pHead.y), ImVec2(pBase.x + bScale, pBase.y), ESP_Filled);
+                ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(left, top), ImVec2(right, bottom), ESP_Filled);
 
             switch (g.g_ESP_BoxType)
             {
             case 0:
-                DrawLine(ImVec2(pBase.x - bScale, pHead.y), ImVec2(pBase.x + bScale, pHead.y), color, 1.f);
-                DrawLine(ImVec2(pBase.x - bScale, pHead.y), ImVec2(pBase.x - bScale, pBase.y), color, 1.f);
-                DrawLine(ImVec2(pBase.x + bScale, pHead.y), ImVec2(pBase.x + bScale, pBase.y), color, 1.f);
-                DrawLine(ImVec2(pBase.x - bScale, pBase.y), ImVec2(pBase.x + bScale, pBase.y), color, 1.f);
+                // Shadow
+                DrawLine(Vector2(left - 1, top - 1), Vector2(right + 2, top - 1), ImColor(0.f, 0.f, 0.f, 1.f), 1.f);
+                DrawLine(Vector2(left - 1, top), Vector2(left - 1, bottom + 2), ImColor(0.f, 0.f, 0.f, 1.f), 1.f);
+                DrawLine(Vector2(right + 1, top), Vector2(right + 1, bottom + 2), ImColor(0.f, 0.f, 0.f, 1.f), 1.f);
+                DrawLine(Vector2(left - 1, bottom + 1), Vector2(right + 1, bottom + 1), ImColor(0.f, 0.f, 0.f, 1.f), 1.f);
+
+                // Main
+                DrawLine(Vector2(left, top), Vector2(right, top), color, 1.f);
+                DrawLine(Vector2(left, top), Vector2(left, bottom), color, 1.f);
+                DrawLine(Vector2(right, top), Vector2(right, bottom), color, 1.f);
+                DrawLine(Vector2(left, bottom), Vector2(right + 1, bottom), color, 1.f);
                 break;
             case 1:
-                DrawLine(ImVec2((pBase.x + bScale), pHead.y), ImVec2((pBase.x + Width / 4.5), pHead.y), color, 1); // �E��
-                DrawLine(ImVec2((pBase.x - bScale), pHead.y), ImVec2((pBase.x - Width / 4.5), pHead.y), color, 1); // ����
-                DrawLine(ImVec2((pBase.x + bScale), pHead.y), ImVec2((pBase.x + bScale), pHead.y + Height / 4), color, 1); // �E�㉡
-                DrawLine(ImVec2((pBase.x - bScale), pHead.y), ImVec2((pBase.x - bScale), pHead.y + Height / 4), color, 1); // ���㉡
-                DrawLine(ImVec2((pBase.x + bScale), pBase.y), ImVec2((pBase.x + bScale), pBase.y - (Height / 4)), color, 1);
-                DrawLine(ImVec2((pBase.x - bScale), pBase.y), ImVec2((pBase.x - bScale), pBase.y - (Height / 4)), color, 1);
-                DrawLine(ImVec2((pBase.x + bScale), pBase.y), ImVec2((pBase.x + Width / 4.5), pBase.y), color, 1);
-                DrawLine(ImVec2((pBase.x - bScale), pBase.y), ImVec2((pBase.x - Width / 4.5), pBase.y), color, 1);
+                DrawLine(Vector2(left, top), Vector2(left + bScale, top), color, 1.f); // Top
+                DrawLine(Vector2(right, top), Vector2(right - bScale, top), color, 1.f);
+                DrawLine(Vector2(left, top), Vector2(left, top + bScale), color, 1.f); // Left
+                DrawLine(Vector2(left, bottom), Vector2(left, bottom - bScale), color, 1.f);
+                DrawLine(Vector2(right, top), Vector2(right, top + bScale), color, 1.f); // Right
+                DrawLine(Vector2(right, bottom), Vector2(right, bottom - bScale), color, 1.f);
+                DrawLine(Vector2(left, bottom), Vector2(left + bScale, bottom), color, 1.f); // Bottom
+                DrawLine(Vector2(right, bottom), Vector2(right - bScale, bottom), color, 1.f);
                 break;
             }
         }
@@ -142,24 +190,23 @@ void CFramework::RenderESP()
         // Healthbar
         if (g.g_ESP_HealthBar)
         {
-            // Health
-            HealthBar(((pBase.x - bScale) - 4.f), pBase.y, 2, -Height, pEntity->m_iHealth, pEntity->m_iMaxHealth);
+            HealthBar(left - 4.f, bottom, 2, -Height, pEntity->m_iHealth, pEntity->m_iMaxHealth); // Health
 
             // Armor
             if (pEntity->m_shieldHealth > 0)
-                ArmorBar((pBase.x + bScale) + 3.f, pBase.y, 2, -Height, pEntity->m_shieldHealth, pEntity->m_shieldHealthMax);
+                ArmorBar(right + 4.f, bottom, 2, -Height, pEntity->m_shieldHealth, pEntity->m_shieldHealthMax);
         }
 
         // Distance
         if (g.g_ESP_Distance) {
             const std::string DistStr = std::to_string((int)pDistance) + "m";
-            String(ImVec2(pBase.x - (ImGui::CalcTextSize(DistStr.c_str()).x / 2.f), pBase.y + 1.f), ImColor(1.f, 1.f, 1.f, 1.f), DistStr.c_str());
+            StringEx(Vector2(right - Center - (ImGui::CalcTextSize(DistStr.c_str()).x / 2.f), bottom + 1), ImColor(1.f, 1.f, 1.f, 1.f), ImGui::GetFontSize(), DistStr.c_str());
         }
 
         // Name
         if (g.g_ESP_Name) {
-            const std::string pName = pEntity->IsPlayer() ? pEntity->GetName() : "NPC";
-            String(ImVec2(pBase.x - (ImGui::CalcTextSize(pName.c_str()).x / 2.f), pHead.y -14.f), ImColor(1.f, 1.f, 1.f, 1.f), pName.c_str());
+            const std::string pName = pEntity->IsPlayer() ? pEntity->pName : "NPC";
+            StringEx(Vector2(right - Center - (ImGui::CalcTextSize(pName.c_str()).x / 2.f), top - ImGui::GetFontSize() - 1), ImColor(1.f, 1.f, 1.f, 1.f), ImGui::GetFontSize(), pName.c_str());
         }
 
         // AimBot
@@ -178,11 +225,11 @@ void CFramework::RenderESP()
             {
                 Vector2 pBone{};
                 Vector3 CheckBone = pEntity->GetEntityBonePosition(i);
-                if (Vec3_Empty(CheckBone) || CheckBone == pEntity->m_localOrigin)
+                if (Vec3_Empty(CheckBone) || CheckBone == pEntity->m_vecAbsOrigin)
                     continue;
 
                 // 弱者男性なのでこうやるしかない。StudioHDRでHitBox取得してもいいけどもう気力がない
-                float B2B = (pEntity->m_localOrigin - CheckBone).Length() * 0.01905f;
+                float B2B = (pEntity->m_vecAbsOrigin - CheckBone).Length() * 0.01905f;
 
                 if (B2B > 2.f)
                     continue;
@@ -216,6 +263,6 @@ void CFramework::RenderESP()
     }
 
     // AimBotのターゲットがいたらAimBotする
-    if (g.g_AimBot && target.entity != NULL)
+    if (g.g_AimBot && target.address != NULL)
         AimBot(target);
 }

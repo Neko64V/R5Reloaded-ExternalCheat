@@ -43,6 +43,7 @@ struct Globals
     float g_ESP_MaxDistance = 500.f;
    
     // Misc
+    bool g_BunnyHop = false;
     bool g_NoRecoil = false;
     float g_NoRecoilVal = 1.f;
 

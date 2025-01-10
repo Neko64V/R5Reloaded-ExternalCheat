@@ -18,12 +18,8 @@ Vector3 GetPredict(CEntity& target , float dist)
     return vOut;
 }
 
-
-
 void CFramework::MiscAll()
 {
-    CEntity* pLocal = &local;
-
     if (!pLocal->Update())
         return;
 
@@ -39,9 +35,24 @@ void CFramework::MiscAll()
             NormalizeAngles(Delta);
 
             if (!Vec3_Empty(Delta))
-                m.Write<Vector3>(pLocal->entity + offset::m_ViewAngle, Delta);
+                m.Write<Vector3>(pLocal->address + offset::m_ViewAngle, Delta);
 
             OldPunch = PunchAngle;
+        }
+    }
+
+    // bHop
+    if (g.g_BunnyHop )
+    {
+        if (GetAsyncKeyState(VK_SPACE))
+        {
+            int flag = pLocal->GetFlag();
+
+            if (flag != 64) {
+                m.Write<uint32_t>(m.m_gBaseAddress + offset::in_jump + 0x8, 5);
+                m.Write<uint32_t>(m.m_gBaseAddress + offset::in_jump + 0x8, 4);
+            }
+
         }
     }
 }
@@ -97,7 +108,7 @@ bool CFramework::AimBot(CEntity& target)
         AimBone = 3;
         break;
     }
-    float distance = ((pTarget->m_localOrigin - pLocal->m_localOrigin).Length() * 0.01905f);
+    float distance = ((pTarget->m_vecAbsOrigin - pLocal->m_vecAbsOrigin).Length() * 0.01905f);
     Vector3 TargetBone = pTarget->GetEntityBonePosition(AimBone); // Head / Neck
 
     if (Vec3_Empty(TargetBone))
@@ -128,7 +139,7 @@ bool CFramework::AimBot(CEntity& target)
         NormalizeAngles(SmoothedAngle);
 
         if (!Vec3_Empty(SmoothedAngle))
-            m.Write<Vector3>(pLocal->entity + offset::m_ViewAngle, SmoothedAngle);
+            m.Write<Vector3>(pLocal->address + offset::m_ViewAngle, SmoothedAngle);
     }
     else
     {
@@ -148,9 +159,9 @@ void CFramework::UpdateList()
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
         // Local
-        local.entity = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwLocalPlayer);
+        pLocal->address = m.Read<uintptr_t>(m.m_gBaseAddress + offset::dwLocalPlayer);
 
-        if (local.entity == NULL)
+        if (pLocal->address == NULL)
             continue;
 
         // EntityList
@@ -160,12 +171,12 @@ void CFramework::UpdateList()
             continue;
 
         // GetEntitys(20000)
-        auto list = m.Read< CEntityListBase>(m.m_gBaseAddress + offset::dwEntityList);
+        auto list = m.Read<CEntityListBase>(m.m_gBaseAddress + offset::dwEntityList);
 
         for (int i = 0; i < ReadCount; i++)
         {
             // Pointer Check
-            if (list.address[i] != NULL && list.address[i] != local.entity)
+            if (list.address[i] != NULL && list.address[i] != local.address)
             {
                 // Player/Item/Bot Check
                 char SignifierName[32]{};
@@ -179,31 +190,17 @@ void CFramework::UpdateList()
                     {
                         // Player/Dummy
                         CEntity p = CEntity();
-                        p.entity = list.address[i];
+                        p.address = list.address[i];
                         p.m_iSignifierName = SignifierName;
                         
                         // SpectatorCheck
                         if (strcmp(SignifierName, "player") == 0 && m.Read<int>(list.address[i] + offset::m_iObserverMode) == 5)
                             spec_list.push_back(p.GetName());
-                        else 
+                        else {
+                            p.pName = p.GetName();
                             ent_list.push_back(p);
+                        }  
                     }
-
-                    // Work in progress...
-                    /*
-                    else if (strcmp(iName, "viewmodel") == 0)
-                        temp_list.push_back(list.address[i]);
-                    else if (strcmp(iName, "prop_survival") == 0)
-                        temp_list.push_back(list.address[i]);
-                    */
-                    /* - Note
-                       player
-                       npc_dummie
-                       weaponx
-                       viewmodel
-                       prop_survival
-                       prop_dynamic
-                   */
                 }                
             }
         }

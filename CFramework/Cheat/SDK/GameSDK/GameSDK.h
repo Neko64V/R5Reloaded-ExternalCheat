@@ -10,7 +10,10 @@ namespace offset
 	const uintptr_t ViewMatrix = 0x1A93D0;
 	const uintptr_t TimeScale = 0x1843340;
 
+	const uintptr_t in_jump = 0xd415120;
+
 	// CBaseEntity
+	const uintptr_t m_fFlags			= 0x98;
 	const uintptr_t m_vecAbsVelocity	= 0x140;
 	const uintptr_t m_localOrigin		= 0x14C;
 	const uintptr_t m_shieldHealth		= 0x170;
@@ -18,6 +21,8 @@ namespace offset
 	const uintptr_t m_iHealth			= 0x3E0;
 	const uintptr_t m_iTeamNum			= 0x3F0;
 	const uintptr_t m_localAngle		= 0x428;
+	const uintptr_t m_Collision			= 0x458;
+	const uintptr_t	m_CollisionGroup	= 0x4d8;
 	const uintptr_t m_iMaxHealth		= 0x510;
 	const uintptr_t m_iSignifierName	= 0x518;
 	const uintptr_t m_lifeState			= 0x730;
@@ -26,6 +31,8 @@ namespace offset
 	const uintptr_t m_vecPunchAngle		= 0x20bc;
 	const uintptr_t m_SwayAngle			= 0x2178;
 	const uintptr_t m_ViewAngle			= 0x2188;
+
+	const uintptr_t m_rgflCoordinateFrame = 0x0870;
 
 	const uintptr_t	m_vecPunchBase_Angle = 0x20a4;
 	const uintptr_t	m_vecPunchBase_AngleVel = 0x20b0;
