@@ -8,7 +8,7 @@ namespace offset
 	const uintptr_t dwLocalPlayer = 0x22E93F8;
 	const uintptr_t ViewRender = 0xD4138F0;
 	const uintptr_t ViewMatrix = 0x1A93D0;
-	const uintptr_t TimeScale = 0x1843340;
+	const uintptr_t TimeScale = 0x1843340; // base + this (float)
 
 	const uintptr_t in_jump = 0xd415120;
 

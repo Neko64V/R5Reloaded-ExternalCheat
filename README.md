@@ -3,8 +3,9 @@ R5Reloaded用のシンプルな外部チートです。チート開発に対す�
 モダンなGUIメニューやビジュアルを兼ね備えた平均的なチートです。研究、分析、学習や調査用にどうぞ。
 
 ## 機能
-* AIMBOT
+* AimBot
 * ESP
+* BunnyHop
 * NoRecoil
 * 観戦者リスト
 * MenuKey : Insert
