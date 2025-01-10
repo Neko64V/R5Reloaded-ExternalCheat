@@ -18,10 +18,14 @@ private:
 	char m_OClass[32] = "WND_CLS";
 
 	// ターゲットウィンドウに関する情報
-	HWND m_TargetHwnd;
+	HWND m_hTargetHwnd;
 	char m_TargetClass[128]{};
 	RECT m_GameRect{};
 	POINT m_GamePoint{};
+
+	// オーバーレイのスタイル
+	LONG MenuStyle = WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
+	LONG ESPStyle = WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
 
 	bool CreateOverlay();
 	HWND GetTargetWindow(const std::string processName);	// 実行ファイル名からウィンドウハンドルを取得する

@@ -1,41 +1,33 @@
 #include "Overlay.h"
 
-LONG MenuStyle = WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
-LONG ESPStyle = WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
-
-bool Overlay::InitOverlay(const char* targetName, int mode)
+bool Overlay::InitOverlay(const char* targetName, int InitMode)
 {
-    switch (mode)
+    if (InitMode == WINDOW_TITLE || InitMode == WINDOW_CLASS)
     {
-    case InitMode::WINDOW_TITLE:
-        m_TargetHwnd = FindWindowA(NULL, targetName);
+        m_hTargetHwnd = InitMode == WINDOW_TITLE ? FindWindowA(NULL, targetName) : FindWindowA(targetName, NULL);
 
-        if (!m_TargetHwnd) {
-            MessageBoxA(nullptr, "Target not found Mode: 0", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+        if (!m_hTargetHwnd) {
+            MessageBoxA(nullptr, "target window not found", "Initialize Failed", MB_TOPMOST | MB_ICONERROR | MB_OK);
             return false;
         }
-        break;
-    case InitMode::WINDOW_CLASS:
-        m_TargetHwnd = FindWindowA(targetName, NULL);
+    }
+    else if (InitMode == PROCESS)
+    {
+        m_hTargetHwnd = GetTargetWindow(targetName);
 
-        if (!m_TargetHwnd) {
-            MessageBoxA(nullptr, "Target not found Mode: 1", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+        if (!m_hTargetHwnd) {
+           MessageBoxA(nullptr, "target process not found", "Initialize Failed", MB_TOPMOST | MB_ICONERROR | MB_OK);
             return false;
         }
-        break;
-    case InitMode::PROCESS: 
-        m_TargetHwnd = GetTargetWindow(targetName);
-
-        if (!m_TargetHwnd) {
-            MessageBoxA(nullptr, "Target not found Mode: 2", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
-            return false;
-        }
-        break;
-    default:
+    }
+    else
+    {
+        MessageBoxA(nullptr, "Invalid init option", "Initialize Failed", MB_TOPMOST | MB_ICONERROR | MB_OK);
         return false;
     }
 
-    GetClassNameA(m_TargetHwnd, m_TargetClass, sizeof(m_TargetClass));
+    // ToDo - このままでいいか考える
+    GetClassNameA(m_hTargetHwnd, m_TargetClass, sizeof(m_TargetClass));
 
     return CreateOverlay();
 }

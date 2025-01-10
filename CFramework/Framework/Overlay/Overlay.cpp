@@ -16,6 +16,9 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 bool Overlay::CreateOverlay()
 {
+    // DPIÉXÉPÅ[ÉãÇ…ÇÊÇÈÇ†ÇÍÇñhÇÆ
+    ImGui_ImplWin32_EnableDpiAwareness();
+
     // Get ClientSize
     GetClientRect(g.g_GameHwnd, &g.g_GameRect);
     ClientToScreen(g.g_GameHwnd, &g.g_GamePoint);

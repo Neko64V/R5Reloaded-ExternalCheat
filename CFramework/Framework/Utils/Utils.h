@@ -7,6 +7,6 @@
 #include <string>
 using namespace DirectX::SimpleMath;
 
+extern const char* KeyNames[];
 extern bool IsKeyDown(int VK);
 extern void KeyBinder(int& target_key, int& BindID);
-extern const char* KeyNames[];

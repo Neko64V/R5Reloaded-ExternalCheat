@@ -1,74 +1,70 @@
 ﻿#include "Memory.h"
 
-bool Memory::AttachProcess(const char* targetName, int mode)
+bool Memory::AttachProcess(const char* targetName, int InitMode)
 {
-    switch (mode)
+    // 任意の方法でPIDを取得する
+    if (InitMode == WINDOW_TITLE || InitMode == WINDOW_CLASS)
     {
-    case InitMode::WINDOW_TITLE: {
-        HWND TargetHwnd = FindWindowA(NULL, targetName);
 
-        if (!TargetHwnd) {
-            MessageBoxA(nullptr, "Please open { GAME NAME #1 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+        // ウィンドウベースでPIDを取得
+        HWND hWindow = InitMode == WINDOW_TITLE ? FindWindowA(nullptr, targetName) : FindWindowA(targetName, nullptr);
+
+        if (!hWindow) {
+            MessageBoxA(nullptr, "please open r5reloaded", "Initialize Failed", MB_TOPMOST | MB_ICONERROR | MB_OK);
             return false;
         }
 
-        GetWindowThreadProcessId(TargetHwnd, &m_PID);
-        break;
+        GetWindowThreadProcessId(hWindow, &m_dwPID);
     }
-    case InitMode::WINDOW_CLASS: {
-        HWND TargetHwnd = FindWindowA(targetName, NULL);
-
-        if (!TargetHwnd) {
-            MessageBoxA(nullptr, "Please open { GAME NAME #2 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
-            return false;
-        }
-
-        GetWindowThreadProcessId(TargetHwnd, &m_PID);
-        break;
-    }
-    case InitMode::PROCESS: {
+    else if (InitMode == PROCESS)
+    {
+        // 実行ファイル名ベースでPIDを取得
         PROCESSENTRY32 process = GetProcess(targetName);
 
         if (process.th32ProcessID == 0) {
-            MessageBoxA(nullptr, "Please open { GAME NAME #3 }", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+            MessageBoxA(nullptr, "please open r5reloaded", "Initialize Failed", MB_TOPMOST | MB_ICONERROR | MB_OK);
             return false;
         }
 
-        m_PID = process.th32ProcessID;
-        break;
+        m_dwPID = process.th32ProcessID;
     }
-    default:
-        MessageBoxA(nullptr, "Invalid memory init option", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+    else 
+    {
+        // 無効なオプション
+        MessageBoxA(nullptr, "Invalid memory init option", "Initialize Failed", MB_TOPMOST | MB_ICONERROR | MB_OK);
         return false;
     }
 
     // プロセスハンドルを取得
-    m_pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_PID);
+    m_hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_dwPID);
 
-    if (!m_pHandle) {
+    if (!m_hProcess) {
         MessageBoxA(nullptr, "Failed to get process handle", "Init Error", MB_TOPMOST | MB_ICONERROR | MB_OK); // 管理者として実行するかアンチチートをバイパスする
         return false;
     }
 
-    // ベースアドレスを取得
-    m_gBaseAddress = GetModuleBase("r5apex.exe");
-
-    if (m_gBaseAddress == 0)
-        MessageBoxA(nullptr, "BaseAddress is 0", "WARNING", MB_OK | MB_TOPMOST);
-
     return true;
+}
+
+void Memory::GetBaseAddress(const char* targetName)
+{
+    // ベースアドレスを取得
+    m_gProcessBaseAddr = GetModuleBase(targetName);
+
+    if (m_gProcessBaseAddr == 0)
+        MessageBoxA(nullptr, "BaseAddress == 0", "WARNING", MB_OK | MB_TOPMOST);
 }
 
 void Memory::DetachProcess()
 {
-    CloseHandle(m_pHandle);
+    CloseHandle(m_hProcess);
 }
 
 uintptr_t Memory::GetModuleBase(const std::string moduleName)
 {
     MODULEENTRY32 entry{};
     entry.dwSize = sizeof(MODULEENTRY32);
-    const auto snapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, m_PID);
+    const auto snapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, m_dwPID);
 
     while (Module32Next(snapShot, &entry))
     {
