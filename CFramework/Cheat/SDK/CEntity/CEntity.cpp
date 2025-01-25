@@ -8,6 +8,7 @@ bool CEntity::Update()
 	if (Vec3_Empty(m_vecAbsOrigin) || m_iHealth <= 0)
 		return false;
 
+	pBoneArray		  = m.Read<uintptr_t>(address + offset::m_pBoneMatrix);
 	m_vecAbsVelocity  = m.Read<Vector3>(address + offset::m_vecAbsVelocity);
 	m_shieldHealth	  = m.Read<int>(address + offset::m_shieldHealth);
 	m_shieldHealthMax = m.Read<int>(address + offset::m_shieldHealthMax);
@@ -39,9 +40,14 @@ Vector3 CEntity::vecMax()
 	return m.Read<Vector3>(address + offset::m_Collision + 0x1C) + m_vecAbsOrigin;
 }
 
-int CEntity::GetLifeState()
+int CEntity::GetFlag()
 {
-	return m.Read<int>(address + offset::m_lifeState);
+	return m.Read<int>(address + offset::m_fFlags);
+}
+
+bool CEntity::IsDead()
+{
+	return m.Read<int>(address + offset::m_lifeState) > 0;
 }
 
 Vector3 CEntity::GetViewAngle()
@@ -95,7 +101,6 @@ std::string CEntity::GetName()
 Vector3 CEntity::GetEntityBonePosition(int BoneId)
 {
 	Vector3 vOut = m_vecAbsOrigin;
-	uintptr_t pBoneArray = m.Read<uintptr_t>(address + offset::m_pBoneMatrix);
 	Bone EntityBone = m.Read<Bone>(pBoneArray + BoneId * 0x30);
 
 	vOut.x += EntityBone.x;

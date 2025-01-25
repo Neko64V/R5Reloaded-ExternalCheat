@@ -20,26 +20,19 @@ public:
 	Vector3 camera_origin;
 	std::string pName;
 	std::string m_iSignifierName;
+	uintptr_t pBoneArray;
 
     // Functions
 	bool Update();
 	bool IsPlayer();
 	bool IsSpectator();
 
+	bool IsDead();
+
 	Vector3 vecMin();
 	Vector3 vecMax();
 
-	int GetFlag()
-	{
-		return m.Read<int>(address + offset::m_fFlags);
-	}
-
-	Matrix GetRgflCoordinateFrame()
-	{
-		return m.Read<Matrix>(address + offset::m_rgflCoordinateFrame);
-	}
-
-	int GetLifeState();
+	int GetFlag();
 	Vector3 GetViewAngle();
 	Vector3 GetSwayAngle();
 	Vector3 GetPunchAngle();

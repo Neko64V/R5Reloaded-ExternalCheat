@@ -157,7 +157,7 @@ void CFramework::RenderMenu()
         ImGui::Spacing();
         style.ItemSpacing.y = 3.f;
         ImGui::CustomSliderFloat("FOV", "##aim_fov", &g.g_Aim_Fov, 50.f, 1000.f);
-        ImGui::CustomSliderFloat("Smooth", "##aim_smt", &g.g_Aim_Smooth, 1.f, 20.f);
+        ImGui::CustomSliderFloat("Smooth", "##aim_smt", &g.g_Aim_Smooth, 1.f, 30.f);
         ImGui::CustomSliderFloat("Distance", "##aim_dist", &g.g_Aim_MaxDistance, 50.f, 300.f);
         style.ItemSpacing.y = DefaultSpacing;
         ImGui::Spacing();

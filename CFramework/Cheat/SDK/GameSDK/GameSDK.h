@@ -10,6 +10,7 @@ namespace offset
 	const uintptr_t ViewMatrix = 0x1A93D0;
 	const uintptr_t TimeScale = 0x1843340; // base + this (float)
 
+	// Button
 	const uintptr_t in_jump = 0xd415120;
 
 	// CBaseEntity
@@ -31,8 +32,6 @@ namespace offset
 	const uintptr_t m_vecPunchAngle		= 0x20bc;
 	const uintptr_t m_SwayAngle			= 0x2178;
 	const uintptr_t m_ViewAngle			= 0x2188;
-
-	const uintptr_t m_rgflCoordinateFrame = 0x0870;
 
 	const uintptr_t	m_vecPunchBase_Angle = 0x20a4;
 	const uintptr_t	m_vecPunchBase_AngleVel = 0x20b0;
