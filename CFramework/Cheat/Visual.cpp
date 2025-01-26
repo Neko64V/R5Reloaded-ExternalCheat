@@ -151,18 +151,17 @@ void CFramework::RenderESP()
         {
             // BoxFilled
             if (g.g_ESP_BoxFilled)
-                ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(left, top), ImVec2(right, bottom), ESP_Filled);
+                ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(left, top), ImVec2(right, bottom), ESP_Shadow);
+
+            // Shadow
+            DrawLine(Vector2(left - 1, top - 1), Vector2(right + 2, top - 1), ESP_Shadow, 1.f);
+            DrawLine(Vector2(left - 1, top), Vector2(left - 1, bottom + 2), ESP_Shadow, 1.f);
+            DrawLine(Vector2(right + 1, top), Vector2(right + 1, bottom + 2), ESP_Shadow, 1.f);
+            DrawLine(Vector2(left - 1, bottom + 1), Vector2(right + 1, bottom + 1), ESP_Shadow, 1.f);
 
             switch (g.g_ESP_BoxType)
             {
             case 0:
-                // Shadow
-                DrawLine(Vector2(left - 1, top - 1), Vector2(right + 2, top - 1), ESP_Shadow, 1.f);
-                DrawLine(Vector2(left - 1, top), Vector2(left - 1, bottom + 2), ESP_Shadow, 1.f);
-                DrawLine(Vector2(right + 1, top), Vector2(right + 1, bottom + 2), ESP_Shadow, 1.f);
-                DrawLine(Vector2(left - 1, bottom + 1), Vector2(right + 1, bottom + 1), ESP_Shadow, 1.f);
-
-                // Main
                 DrawLine(Vector2(left, top), Vector2(right, top), color, 1.f);
                 DrawLine(Vector2(left, top), Vector2(left, bottom), color, 1.f);
                 DrawLine(Vector2(right, top), Vector2(right, bottom), color, 1.f);

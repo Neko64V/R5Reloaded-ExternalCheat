@@ -23,13 +23,12 @@ private:
     ImColor SetESPColor(bool& is_visible, bool is_team);
 
     // Colors
-    ImColor ESP_Default = { 1.f, 1.f, 1.f, 1.f };
-    ImColor ESP_Visible = { 1.f, 0.f, 0.f, 1.f };
-    ImColor ESP_Team    = { 0.f, 1.f, 1.f, 1.f };
-    ImColor ESP_Filled  = { 0.f, 0.f, 0.f, 0.2f };
+    ImColor ESP_Default = { 1.f, 0.f, 0.f, 1.f };
+    ImColor ESP_Visible = { 0.f, 1.f, 0.f, 1.f };
+    ImColor ESP_Team    = { 0.f, 0.75f, 1.f, 1.f };
     ImColor ESP_Shadow  = { 0.f, 0.f, 0.f, 0.3f };
 
-    ImColor FOV_User = { 1.f, 1.f, 1.f, 1.f };
+    ImColor FOV_User = { 1.f, 1.f, 1.f, 0.5f };
     ImColor CrosshairColor = { 0.f, 1.f, 0.f, 1.f };
 
     void DrawLine(Vector2 a, Vector2 b, ImColor color, float width)
@@ -75,7 +74,7 @@ private:
     }
     void StringEx(Vector2 pos, ImColor color, float font_size, const char* text)
     {
-        ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), font_size, ImVec2((int)pos.x + 1.f, (int)pos.y + 1.f), ImColor(0.f, 0.f, 0.f, 1.f), text, text + strlen(text), 1024, 0);
+        ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), font_size, ImVec2((int)pos.x + 1.f, (int)pos.y + 1.f), ESP_Shadow, text, text + strlen(text), 1024, 0);
         ImGui::GetBackgroundDrawList()->AddText(ImGui::GetFont(), font_size, ImVec2((int)pos.x, (int)pos.y), color, text, text + strlen(text), 1024, 0);
     }
 };
