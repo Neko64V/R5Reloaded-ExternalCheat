@@ -11,13 +11,23 @@ bool CEntity::Update()
 	pBoneArray		  = m.Read<uintptr_t>(address + offset::m_pBoneMatrix);
 	m_vecAbsVelocity  = m.Read<Vector3>(address + offset::m_vecAbsVelocity);
 	m_shieldHealth	  = m.Read<int>(address + offset::m_shieldHealth);
-	m_shieldHealthMax = m.Read<int>(address + offset::m_shieldHealthMax);
-	m_iTeamNum		  = m.Read<int>(address + offset::m_iTeamNum);
-	m_iMaxHealth	  = m.Read<int>(address + offset::m_iMaxHealth);
 	m_lastvisibletime = m.Read<float>(address + offset::m_lastvisibletime);
 	camera_origin	  = m.Read<Vector3>(address + offset::camera_origin);
 
 	return true;
+}
+
+void CEntity::UpdateStatic()
+{
+	m_iTeamNum = m.Read<int>(address + offset::m_iTeamNum);
+	m_iMaxHealth = m.Read<int>(address + offset::m_iMaxHealth);
+	m_shieldHealthMax = m.Read<int>(address + offset::m_shieldHealthMax);
+
+	// Name
+	char name[32]{};
+	uintptr_t NameAddress = m.Read<uintptr_t>(address + 0x3BF8);
+	m.ReadString(NameAddress, name, sizeof(name));
+	pName = name;
 }
 
 bool CEntity::IsPlayer()
@@ -87,15 +97,6 @@ void CEntity::DisableGlow()
 {
 	m.Write<int>(address + 0x310, 0);
 	m.Write<int>(address + 0x320, 0);
-}
-
-std::string CEntity::GetName()
-{
-	char pName[32]{};
-	uintptr_t NameAddress = m.Read<uintptr_t>(address + 0x3BF8);
-	m.ReadString(NameAddress, pName, sizeof(pName));
-
-	return pName;
 }
 
 Vector3 CEntity::GetEntityBonePosition(int BoneId)

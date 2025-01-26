@@ -10,6 +10,10 @@ namespace offset
 	const uintptr_t ViewMatrix = 0x1A93D0;
 	const uintptr_t TimeScale = 0x1843340; // base + this (float)
 
+	// https://github.com/cryotb/R5R_AimAssist_Forcer
+	// Ç±ÇËÇ·Ç∑Ç≤Ç¢Åc
+	const uintptr_t AimAssistVal = 0x1718B00;
+
 	// Button
 	const uintptr_t in_jump = 0xd415120;
 

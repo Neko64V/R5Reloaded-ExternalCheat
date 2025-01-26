@@ -24,6 +24,7 @@ public:
 
     // Functions
 	bool Update();
+	void UpdateStatic();
 	bool IsPlayer();
 	bool IsSpectator();
 
@@ -33,14 +34,12 @@ public:
 	Vector3 vecMax();
 
 	int GetFlag();
+	float GetTimeBase();
 	Vector3 GetViewAngle();
 	Vector3 GetSwayAngle();
 	Vector3 GetPunchAngle();
 	Vector3 GetWeaponPunchAngle();
-	float GetTimeBase();
+	Vector3 GetEntityBonePosition(int BoneId);
 	void EnableGlow(GlowColor color, GlowMode mode);
 	void DisableGlow();
-
-    std::string GetName();
-	Vector3 GetEntityBonePosition(int BoneId);
 };
