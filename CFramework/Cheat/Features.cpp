@@ -62,13 +62,13 @@ void CFramework::UpdateList() // C6262 :(
                         CEntity p = CEntity();
                         p.address = list.entity[i].address;
                         p.m_iSignifierName = SignifierName;
+                        p.UpdateStatic();
 
                         // SpectatorCheck
-                        if (strcmp(SignifierName, "player") == 0 && m.Read<int>(list.entity[i].address + offset::m_iObserverMode) == 5)
-                            spec_list.push_back(p.GetName());
-                        else {
-                            // 静的なデータ (== 名前等) をここであらかじめ取得しておく
-                            p.pName = p.GetName();
+                        if (strcmp(SignifierName, "player") == 0 && m.Read<int>(list.entity[i].address + offset::m_iObserverMode) == 5) {
+                            spec_list.push_back(p.pName);
+                        }
+                        else if (!p.IsDead()) {
                             ent_list.push_back(p);
                         }
                     }
