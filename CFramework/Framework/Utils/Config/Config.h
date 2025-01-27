@@ -24,7 +24,7 @@ struct Globals
     float g_Aim_Smooth = 1.f;
     float g_Aim_MaxDistance = 150.f;
     int g_Aim_Mode = 0;   // Memory/Mouse
-    int g_Aim_Bone = 0;   // Bone
+    int g_Aim_Bone = 1;   // Bone
     int g_Aim_Type = 0;   // FOV/Dist
     int g_AimKeyType = 1; // and/or
 
