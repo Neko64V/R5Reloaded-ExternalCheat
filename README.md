@@ -33,4 +33,4 @@ https://github.com/cryotb/R5R_AimAssist_Forcer
 これらの用途以外で使用した場合に発生した如何なる損害についても、製作者(Neko64V)は一切の責任を負いません。  
 
 ## 写真
-![AIM](R5R_External.png_)
+![AIM](R5R_External.png)
