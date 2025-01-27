@@ -4,6 +4,16 @@
 const int ReadCount = 15000;
 Vector3 GetPredict(CEntity& target, float dist);
 
+/*
+// Memo
+m_helmetType=0x4044
+m_armorType = 0x4048
+
+viewmodel
+weaponx
+prop_survival
+*/
+
 struct Entity
 {
     uint64_t address;
@@ -18,8 +28,7 @@ struct CEntityListBase
 /*
     [ 概要 ]
     ESPで表示したいEntityのみをここで抽出することでESPのパフォーマンスを劇的に改善できる。
-    レンダリングを行うスレッドで数千回以上のReadProcessMemoryからのcontinue;をするだけでかなりのロスなのでそれが回避できる功績は大きい。
-*/
+    レンダリングを行うスレッドで数千回以上のReadProcessMemoryからのcontinue;をするだけでかなりのロスなのでそれが回避できる功績は大きい。 */
 void CFramework::UpdateList() // C6262 :(
 {
     while (g.g_Run)
@@ -40,7 +49,7 @@ void CFramework::UpdateList() // C6262 :(
         if (list_addr == NULL)
             continue;
 
-        // GetEntitys(20000)
+        // GetEntitys(15000)
         auto list = m.Read<CEntityListBase>(m.m_gProcessBaseAddr + offset::dwEntityList);
 
         for (int i = 0; i < ReadCount; i++)
@@ -54,12 +63,14 @@ void CFramework::UpdateList() // C6262 :(
 
                 if (sig_name_addr != NULL)
                 {
+                    // Player/Dummy
+                    CEntity p = CEntity();
+
                     m.ReadString(sig_name_addr, SignifierName, sizeof(SignifierName));
 
+                    // Player/Dummy
                     if (strcmp(SignifierName, "player") == 0 || g.g_ESP_NPC && strcmp(SignifierName, "npc_dummie") == 0)
                     {
-                        // Player/Dummy
-                        CEntity p = CEntity();
                         p.address = list.entity[i].address;
                         p.m_iSignifierName = SignifierName;
                         p.UpdateStatic();
@@ -107,6 +118,7 @@ void CFramework::MiscAll()
     }
 
     // bHop
+    /*
     if (g.g_BunnyHop)
     {
         if (GetAsyncKeyState(VK_SPACE))
@@ -115,15 +127,15 @@ void CFramework::MiscAll()
 
             if (flag != 64) {
                 m.Write<uint32_t>(m.m_gProcessBaseAddr + offset::in_jump + 0x8, 5);
-                timeBeginPeriod(1); // タイマー解像度を1msに設定
-                Sleep(1);          // 10msスリープ
-                timeEndPeriod(1);   // タイマー解像度を元に戻す
+                std::this_thread::sleep_for(std::chrono::microseconds(1));
                 m.Write<uint32_t>(m.m_gProcessBaseAddr + offset::in_jump + 0x8, 4);
             }
         }
-    }
+    }*/
 }
 
+// ToDo : 調査する
+// https://www.unknowncheats.me/forum/counterstrike-global-offensive/322525-easy-external-antiaim.html
 bool CFramework::AimBot(CEntity& target)
 {
     /*----| SomeChecks |--------------------------------------------------------------------------------*/
@@ -215,12 +227,6 @@ bool CFramework::AimBot(CEntity& target)
 
         mouse_event(MOUSEEVENTF_MOVE, -cX, -cY, 0, 0);
     }
-}
-
-// :(
-ImColor CFramework::SetESPColor(bool& is_visible, bool is_team)
-{
-    return is_team ? ESP_Team : (is_visible ? ESP_Visible : ESP_Default);
 }
 
 Vector3 GetPredict(CEntity& target, float dist)

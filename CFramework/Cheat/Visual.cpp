@@ -2,6 +2,8 @@
 
 void CFramework::RenderInfo()
 {
+    String(Vector2(), ImColor(1.f, 1.f, 1.f, 1.f), std::to_string((int)ImGui::GetIO().Framerate).c_str());
+
     // FovCircle
     if (g.g_AimBot && g.g_Aim_DrawFov)
         ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(g.g_GameRect.right / 2.f, g.g_GameRect.bottom / 2.f), g.g_Aim_Fov, FOV_User);
@@ -27,7 +29,7 @@ void CFramework::RenderInfo()
     if (g.g_SpectatorList)
     {
         if (SpectatorPlayerName.size() > 0)
-            String(Vector2(g.g_GameRect.right / 2 - (ImGui::CalcTextSize("[ Spectator Found! ]").x), g.g_GameRect.top), ImColor(1.f, 0.f, 0.f, 1.f), "[ Spectator Found! ]");
+            String(Vector2(g.g_GameRect.right / 2 - (ImGui::CalcTextSize("[ Spectator Found! ]").x / 2), g.g_GameRect.top), ImColor(1.f, 0.f, 0.f, 1.f), "[ Spectator Found! ]");
 
         ImGui::SetNextWindowBgAlpha(SpectatorPlayerName.size() > 0 ? 0.9f : 0.35f);
         ImGui::SetNextWindowPos(ImVec2(12.f, 16.f));
@@ -47,6 +49,10 @@ void CFramework::RenderInfo()
 void CFramework::RenderESP()
 {
     CEntity* pLocal = &local;
+
+    // SilentAim dev
+    //uintptr_t pCommand = m.Read<uintptr_t>(m.m_gProcessBaseAddr + 0x22d0710 + 0xF8);
+    //std::cout << m.Read<int>(pCommand + 0x280) << std::endl; // == UserCMD
 
     // Localの更新に失敗したらこの関数を終了
     if (!pLocal->Update())
@@ -87,7 +93,7 @@ void CFramework::RenderESP()
             continue;
         */
 
-        // 方法2 - SourceEngineのみではあるが m_Collision を使用する方法
+        // 方法2 - m_Collision を使用する方法
         // Counter Strike: Source で使ってたコードを流用している
         Vector3 min = pEntity->vecMin();
         Vector3 max = pEntity->vecMax();
@@ -256,6 +262,8 @@ void CFramework::RenderESP()
     }
 
     // AimBotのターゲットがいたらAimBotする
-    if (g.g_AimBot && target.address != NULL)
-        AimBot(target);
+    if (g.g_AimBot && target.address != NULL) {
+        if (GetForegroundWindow() == g.g_GameHwnd)
+            AimBot(target);
+    } 
 }

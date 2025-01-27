@@ -112,7 +112,7 @@ void CFramework::RenderMenu()
         ImGui::Text("Misc");
         ImGui::Separator();
         ImGui::Spacing();
-        ImGui::Checkbox("BunnyHop", &g.g_BunnyHop);
+        //ImGui::Checkbox("BunnyHop", &g.g_BunnyHop);
         ImGui::Checkbox("NoReocil", &g.g_NoRecoil);
 
         ImGui::EndChild();
@@ -129,7 +129,7 @@ void CFramework::RenderMenu()
         // Custom AimAssist Value
         static float new_aa = 0.8f;
 
-        ImGui::Text("NoRecoil");
+        ImGui::Text("AimAssist Value Changer");
         ImGui::Separator();
         ImGui::Spacing();
 
@@ -148,6 +148,8 @@ void CFramework::RenderMenu()
         ImGui::Spacing();
         ImGui::Checkbox("Crosshair", &g.g_Crosshair);
         ImGui::Checkbox("StreamProof", &g.g_StreamProof);
+
+        ImGui::CustomSliderInt("Max Framerate", "##MaxFrame", &g.g_MaxFramerate, 30, 500);
 
         ImGui::EndChild();
         ImGui::BeginChild("##C031", ImVec2(ImGui::GetContentRegionAvail()), true);
