@@ -18,7 +18,6 @@ private:
 	char m_OClass[32] = "WND_CLS";
 
 	// ターゲットウィンドウに関する情報
-	HWND m_hTargetHwnd;
 	char m_TargetClass[128]{};
 	RECT m_GameRect{};
 	POINT m_GamePoint{};
@@ -31,6 +30,7 @@ private:
 	HWND GetTargetWindow(const std::string processName);	// 実行ファイル名からウィンドウハンドルを取得する
 public:
 	bool InitOverlay(const char* targetName, int mode);
+	void OverlayUserFunction();
 	void OverlayLoop();
 	void DestroyOverlay();
 	void OverlayManager();

@@ -53,6 +53,7 @@ struct Globals
     bool g_Crosshair = false;
     int g_CrosshairSize = 3;
     int g_CrosshairType = 0;
+    int g_MaxFramerate = 165;
 
     // Key
     int g_MenuKey = VK_INSERT;
