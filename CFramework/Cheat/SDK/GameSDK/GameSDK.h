@@ -26,6 +26,7 @@ namespace offset
 	const uintptr_t m_iHealth			= 0x3E0;
 	const uintptr_t m_iTeamNum			= 0x3F0;
 	const uintptr_t m_localAngle		= 0x428;
+	const uintptr_t m_hOwnerEntity		= 0x43c;
 	const uintptr_t m_Collision			= 0x458;
 	const uintptr_t	m_CollisionGroup	= 0x4d8;
 	const uintptr_t m_iMaxHealth		= 0x510;

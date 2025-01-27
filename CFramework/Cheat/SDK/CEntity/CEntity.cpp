@@ -4,10 +4,10 @@ bool CEntity::Update()
 {
 	m_vecAbsOrigin	  = m.Read<Vector3>(address + offset::m_localOrigin);
 	m_iHealth		  = m.Read<int>(address + offset::m_iHealth);
-
+	
 	if (Vec3_Empty(m_vecAbsOrigin) || m_iHealth <= 0)
 		return false;
-
+		
 	pBoneArray		  = m.Read<uintptr_t>(address + offset::m_pBoneMatrix);
 	m_vecAbsVelocity  = m.Read<Vector3>(address + offset::m_vecAbsVelocity);
 	m_shieldHealth	  = m.Read<int>(address + offset::m_shieldHealth);
