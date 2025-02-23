@@ -4,31 +4,22 @@
 const int ReadCount = 15000;
 Vector3 GetPredict(CEntity& target, float dist);
 
-/*
-// Memo
-m_helmetType=0x4044
-m_armorType = 0x4048
-
-viewmodel
-weaponx
-prop_survival
-*/
-
-struct Entity
-{
+// 0x20
+struct Entity {
     uint64_t address;
     uint64_t junk[3];
 };
 
-struct CEntityListBase
-{
+struct entitylist_t {
     Entity entity[ReadCount]{};
 };
 
 /*
     [ 概要 ]
     ESPで表示したいEntityのみをここで抽出することでESPのパフォーマンスを劇的に改善できる。
-    レンダリングを行うスレッドで数千回以上のReadProcessMemoryからのcontinue;をするだけでかなりのロスなのでそれが回避できる功績は大きい。 */
+    レンダリングを行うスレッドで数千回以上のReadProcessMemoryからのcontinue;をするだけでかなりのロスなのでそれが回避できる功績は大きい。
+    が、多分脆弱性になり得る。
+*/
 void CFramework::UpdateList() // C6262 :(
 {
     while (g.g_Run)
@@ -37,51 +28,51 @@ void CFramework::UpdateList() // C6262 :(
         std::vector<std::string> spec_list;
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-        // Local
-        pLocal->address = m.Read<uintptr_t>(m.m_gProcessBaseAddr + offset::dwLocalPlayer);
+        // LocalPlayerを取得
+        pLocal->m_address = m.Read<uintptr_t>(m.m_gProcessBaseAddr + offset::dwLocalPlayer);
 
-        if (pLocal->address == NULL)
+        if (pLocal->m_address == NULL)
             continue;
 
-        // EntityList
+        // EntityListが有効かを調査
         auto list_addr = m.Read<uintptr_t>(m.m_gProcessBaseAddr + offset::dwEntityList);
 
         if (list_addr == NULL)
             continue;
 
-        // GetEntitys(15000)
-        auto list = m.Read<CEntityListBase>(m.m_gProcessBaseAddr + offset::dwEntityList);
+        // EntityListを上で作ったstructを使い一括で読み取る
+        auto list = m.Read<entitylist_t>(m.m_gProcessBaseAddr + offset::dwEntityList);
 
+        // ループ
         for (int i = 0; i < ReadCount; i++)
         {
-            // Pointer Check
-            if (list.entity[i].address != NULL && list.entity[i].address != local.address)
+            // Localでははいか、無効なポインタではないか
+            if (list.entity[i].address != NULL && list.entity[i].address != local.m_address)
             {
-                // Player/Item/Bot Check
+                // SignifierNameを取得。エンティティの種類別にある固有の名前みたいなもの。
                 char SignifierName[32]{};
                 const uintptr_t sig_name_addr = m.Read<uintptr_t>(list.entity[i].address + offset::m_iSignifierName);
 
+                // SignifierNameを読み取る為のポインタが無効ではなかったら
                 if (sig_name_addr != NULL)
                 {
-                    // Player/Dummy
-                    CEntity p = CEntity();
-
+                    // SignifierNameを取得
                     m.ReadString(sig_name_addr, SignifierName, sizeof(SignifierName));
 
-                    // Player/Dummy
+                    // プレイヤー / ダミー
                     if (strcmp(SignifierName, "player") == 0 || g.g_ESP_NPC && strcmp(SignifierName, "npc_dummie") == 0)
                     {
-                        p.address = list.entity[i].address;
+                        // 格納用にCEntityインスタンスを作り、情報を格納してあげる
+                        CEntity p = CEntity();
+                        p.m_address = list.entity[i].address;
                         p.m_iSignifierName = SignifierName;
-                        p.UpdateStatic();
+                        p.UpdateStatic(); // 静的な情報を取得する
 
-                        // SpectatorCheck
-                        if (strcmp(SignifierName, "player") == 0 && m.Read<int>(list.entity[i].address + offset::m_iObserverMode) == 5) {
+                        // 観戦中だったら
+                        if (strcmp(SignifierName, "player") == 0 && p.IsSpectator())
                             spec_list.push_back(p.pName);
-                        }
-                        else if (!p.IsDead()) {
+                        else if (!p.IsDead()) // 生きてたら
                             ent_list.push_back(p);
-                        }
                     }
                 }
             }
@@ -111,7 +102,7 @@ void CFramework::MiscAll()
             NormalizeAngles(Delta);
 
             if (!Vec3_Empty(Delta))
-                m.Write<Vector3>(pLocal->address + offset::m_ViewAngle, Delta);
+                m.Write<Vector3>(pLocal->m_address + offset::m_vecViewAngle, Delta);
 
             OldPunch = PunchAngle;
         }
@@ -218,7 +209,7 @@ bool CFramework::AimBot(CEntity& target)
         NormalizeAngles(SmoothedAngle);
 
         if (!Vec3_Empty(SmoothedAngle))
-            m.Write<Vector3>(pLocal->address + offset::m_ViewAngle, SmoothedAngle);
+            m.Write<Vector3>(pLocal->m_address + offset::m_vecViewAngle, SmoothedAngle);
     }
     else
     {
@@ -232,7 +223,7 @@ bool CFramework::AimBot(CEntity& target)
 Vector3 GetPredict(CEntity& target, float dist)
 {
     Vector3 vOut{};
-    float bulletTime = dist / 650.f;
+    float bulletTime = dist / 750.f;
     vOut.x = target.m_vecAbsVelocity.x * bulletTime;
     vOut.y = target.m_vecAbsVelocity.y * bulletTime;
     vOut.z = (150.f * 0.5f * (bulletTime * bulletTime));

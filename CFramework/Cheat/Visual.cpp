@@ -61,7 +61,7 @@ void CFramework::RenderESP()
     // AimBot関連
     float FOV = 0.f;
     float MinFov = 999.f;
-    float MinDistance = 9999.f;
+    int MinDistance = INT_MAX;
     CEntity target = CEntity();
     Vector2 ScreenMiddle = { (float)g.g_GameRect.right / 2.f, (float)g.g_GameRect.bottom / 2.f };
 
@@ -78,7 +78,7 @@ void CFramework::RenderESP()
             continue;
 
         // 距離を取得
-        const float pDistance = ((pLocal->m_vecAbsOrigin - pEntity->m_vecAbsOrigin).Length() * 0.01905f);
+        const int pDistance = ((pLocal->m_vecAbsOrigin - pEntity->m_vecAbsOrigin).Length() * 0.01905f);
 
         // 各種チェック
         if (g.g_ESP_MaxDistance < pDistance)
@@ -86,55 +86,69 @@ void CFramework::RenderESP()
         else if (!g.g_ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
             continue;
 
-        /* // 方法1 - 頭とベース座標の位置をベースにする
-        Vector2 pBase{}, pHead{};
-        const Vector3 Head = pEntity->GetEntityBonePosition(8) + Vector3(0.f, 0.f, 12.f);
-        if (!WorldToScreen(ViewMatrix, g.g_GameRect, pEntity->m_vecAbsOrigin + Vector3(0.f, 0.f, -6.f), pBase) || !WorldToScreen(ViewMatrix, g.g_GameRect, Head, pHead))
-            continue;
-        */
-
-        // 方法2 - m_Collision を使用する方法
-        // Counter Strike: Source で使ってたコードを流用している
-        Vector3 min = pEntity->vecMin();
-        Vector3 max = pEntity->vecMax();
-
         int left, top, right, bottom;
-        Vector2 flb, brt, blb, frt, frb, brb, blt, flt;
 
-        Vector3 points[8] = { Vector3(min.x, min.y, min.z), Vector3(min.x, max.y, min.z), Vector3(max.x, max.y, min.z),
-                    Vector3(max.x, min.y, min.z), Vector3(max.x, max.y, max.z), Vector3(min.x, max.y, max.z),
-                    Vector3(min.x, min.y, max.z), Vector3(max.x, min.y, max.z) };
-
-        // m_rgflCoordinateFrame は不要なのでこのままW2Sでよい
-        if (!WorldToScreen(ViewMatrix, g.g_GameRect, points[3], flb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[5], brt) ||
-            !WorldToScreen(ViewMatrix, g.g_GameRect, points[0], blb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[4], frt) ||
-            !WorldToScreen(ViewMatrix, g.g_GameRect, points[2], frb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[1], brb) ||
-            !WorldToScreen(ViewMatrix, g.g_GameRect, points[6], blt) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[7], flt))
-            continue;
-
-        Vector2 vec2_array[] = { flb, brt, blb, frt, frb, brb, blt, flt };
-        left = flb.x;
-        top = flb.y;
-        right = flb.x;
-        bottom = flb.y;
-
-        for (auto j = 1; j < 8; ++j)
+        switch (g.g_ESP_RenderMode)
         {
-            if (left > vec2_array[j].x)
-                left = vec2_array[j].x;
-            if (bottom < vec2_array[j].y)
-                bottom = vec2_array[j].y;
-            if (right < vec2_array[j].x)
-                right = vec2_array[j].x;
-            if (top > vec2_array[j].y)
-                top = vec2_array[j].y;
+        case 0: {
+            // 方法1 - 頭とベース座標の位置をベースにする
+            Vector2 pBase{}, pHead{};
+            const Vector3 Head = pEntity->GetEntityBonePosition(8) + Vector3(0.f, 0.f, 12.f);
+            if (!WorldToScreen(ViewMatrix, g.g_GameRect, pEntity->m_vecAbsOrigin + Vector3(0.f, 0.f, -6.f), pBase) || !WorldToScreen(ViewMatrix, g.g_GameRect, Head, pHead))
+                continue;
+
+            int height = pBase.y - pHead.y;
+            int width = height / 3;
+            left = pBase.x - width;
+            top = pHead.y;
+            bottom = pBase.y;
+            right = pBase.x + width;
+        }break;
+        case 1: {
+            // 方法2 - m_Collision を使用する方法
+            // Counter Strike: Source で使ってたコードを流用している
+            Vector3 min = pEntity->vecMin();
+            Vector3 max = pEntity->vecMax();
+
+            Vector2 flb, brt, blb, frt, frb, brb, blt, flt;
+            Vector3 points[8] = { Vector3(min.x, min.y, min.z), Vector3(min.x, max.y, min.z), Vector3(max.x, max.y, min.z),
+                        Vector3(max.x, min.y, min.z), Vector3(max.x, max.y, max.z), Vector3(min.x, max.y, max.z),
+                        Vector3(min.x, min.y, max.z), Vector3(max.x, min.y, max.z) };
+
+            // m_rgflCoordinateFrame は不要なのでこのままW2Sでよい
+            if (!WorldToScreen(ViewMatrix, g.g_GameRect, points[3], flb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[5], brt) ||
+                !WorldToScreen(ViewMatrix, g.g_GameRect, points[0], blb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[4], frt) ||
+                !WorldToScreen(ViewMatrix, g.g_GameRect, points[2], frb) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[1], brb) ||
+                !WorldToScreen(ViewMatrix, g.g_GameRect, points[6], blt) || !WorldToScreen(ViewMatrix, g.g_GameRect, points[7], flt))
+                continue;
+
+            Vector2 vec2_array[] = { flb, brt, blb, frt, frb, brb, blt, flt };
+            left = flb.x;
+            top = flb.y;
+            right = flb.x;
+            bottom = flb.y;
+
+            for (auto j = 1; j < 8; ++j)
+            {
+                if (left > vec2_array[j].x)
+                    left = vec2_array[j].x;
+                if (bottom < vec2_array[j].y)
+                    bottom = vec2_array[j].y;
+                if (right < vec2_array[j].x)
+                    right = vec2_array[j].x;
+                if (top > vec2_array[j].y)
+                    top = vec2_array[j].y;
+            }
+        }break;
+        default:
+            break;
         }
 
         // サイズ算出
         const int Height = bottom - top;
         const int Width = right - left;
-        const int Center = (right - left) / 2.f;
-        const int bScale = (right - left) / 3.f;
+        const int Center = (right - left) / 2;
+        const int bScale = (right - left) / 3;
 
         // 対象が見えてるかチェックする。
         bool visible = pEntity->m_lastvisibletime + 0.125f >= pLocal->GetTimeBase();
@@ -145,7 +159,7 @@ void CFramework::RenderESP()
         // Glow
         if (g.g_ESP_Glow)
             pEntity->EnableGlow(GlowColor{ color.Value.x, color.Value.y, color.Value.z }, GlowMode{ 101, 6, 85, 96 });
-        else if (!g.g_ESP_Glow && m.Read<int>(pEntity->address + 0x310) != 0)
+        else if (!g.g_ESP_Glow && m.Read<int>(pEntity->m_address + 0x310) != 0)
             pEntity->DisableGlow();
 
         // Line
@@ -198,7 +212,7 @@ void CFramework::RenderESP()
 
         // Distance
         if (g.g_ESP_Distance) {
-            const std::string DistStr = std::to_string((int)pDistance) + "m";
+            const std::string DistStr = std::to_string(pDistance) + "m";
             StringEx(Vector2(right - Center - (ImGui::CalcTextSize(DistStr.c_str()).x / 2.f), bottom + 1), ImColor(1.f, 1.f, 1.f, 1.f), ImGui::GetFontSize(), DistStr.c_str());
         }
 
@@ -262,7 +276,7 @@ void CFramework::RenderESP()
     }
 
     // AimBotのターゲットがいたらAimBotする
-    if (g.g_AimBot && target.address != NULL) {
+    if (g.g_AimBot && target.m_address != NULL) {
         if (GetForegroundWindow() == g.g_GameHwnd)
             AimBot(target);
     } 

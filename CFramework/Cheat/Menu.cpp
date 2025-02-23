@@ -1,13 +1,15 @@
 #include "FrameCore.h"
 
 // ImGui::Combo/ImGui::List等で使う文字列群
+const char* ESP_RenderModeList[] = { "Bone", "m_Collision" };
 const char* BoxTypeList[] = { "Simple", "Cornered" };
 const char* AimTypeList[] = { "FOV", "Distance" };
 const char* AimModeList[] = { "Memory", "Mouse" };
 const char* AimBoneList[] = { "Head", "Chest" };
 const char* AimKeyTypeList[] = { "and", "or" };
 const char* CrosshairList[] = { "Cross", "Circle" };
-std::vector<std::string> MenuSelectList = { "AimBot", "Visual", "Misc", "System" };
+std::vector<const char*> MenuStringList = { "AimBot", "Visual", "Misc", "Setting" };
+std::vector<const char*> MenuIconList = { ICON_FA_CROSSHAIRS, ICON_FA_EYE, ICON_FA_BARS, ICON_FA_GEAR };
 
 // チートのメニュー
 void CFramework::RenderMenu()
@@ -28,11 +30,15 @@ void CFramework::RenderMenu()
 
     ImGui::NewLine();
 
-    for (int i = 0; i < MenuSelectList.size(); i++)
+    ImGui::PushFont(icon);
+
+    for (int i = 0; i < MenuStringList.size(); i++)
     {
-        if (ImGui::CustomButton(MenuSelectList[i].c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 35.f), Index == i ? true : false))
+        if (ImGui::CustomButton(MenuIconList[i], MenuStringList[i], ImVec2(ImGui::GetContentRegionAvail().x, 35.f), Index == i ? true : false))
             Index = i;
     }
+
+    ImGui::PopFont();
 
     ImGui::EndChild();
     //---// Clild 0 End //-------------------------------//
@@ -44,6 +50,8 @@ void CFramework::RenderMenu()
 
     //---// Left //--------------------------------------//
     ImGui::BeginChild("##LeftChild", ImVec2(ImGui::GetContentRegionAvail().x / 2.f - 16.f, ImGui::GetContentRegionAvail().y), false);
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.1f, 1.f));
 
     switch (Index)
     {
@@ -81,7 +89,7 @@ void CFramework::RenderMenu()
         ImGui::EndChild();
         break;
     case 1: // visual
-        ImGui::BeginChild("##C010", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y / 2.5f), true);
+        ImGui::BeginChild("##C010", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y / 2.85f), true);
         ImGui::Text("Visual");
         ImGui::Separator();
         ImGui::Spacing();
@@ -169,6 +177,8 @@ void CFramework::RenderMenu()
         break;
     }
 
+    ImGui::PopStyleColor();
+
     ImGui::EndChild();
     //---------------------------------------------------//
 
@@ -176,6 +186,8 @@ void CFramework::RenderMenu()
 
     //---// Right //--------------------------------------//
     ImGui::BeginChild("##RightChild", ImVec2(ImGui::GetContentRegionAvail()), false);
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.1f, 1.f));
 
     switch (Index)
     {
@@ -221,18 +233,19 @@ void CFramework::RenderMenu()
         ImGui::EndChild();
         break;
     case 1: // visual
-        ImGui::BeginChild("##C110", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y / 3.f), true);
+        ImGui::BeginChild("##C110", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y / 2.5f), true);
 
         ImGui::Text("ESP Setting");
         ImGui::Separator();
         ImGui::Spacing();
 
-        ImGui::CustomSliderFloat("Distance", "##Dist", &g.g_ESP_MaxDistance, 100.f, 2000.f);
-
+        ImGui::CustomSliderInt("Distance", "##Dist", &g.g_ESP_MaxDistance, 100, 2000);
+       
         ImGui::Spacing();
         ImGui::Spacing();
 
         ImGui::Combo("BoxType", &g.g_ESP_BoxType, BoxTypeList, IM_ARRAYSIZE(BoxTypeList));
+        ImGui::Combo("ESP Mode", &g.g_ESP_RenderMode, ESP_RenderModeList, IM_ARRAYSIZE(ESP_RenderModeList));
 
         ImGui::EndChild();
         ImGui::BeginChild("##C111", ImVec2(ImGui::GetContentRegionAvail()), true);
@@ -267,6 +280,8 @@ void CFramework::RenderMenu()
     default:
         break;
     }
+
+    ImGui::PopStyleColor();
 
     ImGui::EndChild();
     ImGui::EndChild();

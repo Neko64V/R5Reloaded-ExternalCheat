@@ -4,10 +4,15 @@
 #include "../Framework/ImGui/imgui_impl_dx11.h"
 #include "../Framework/ImGui/Custom.h"
 #include "SDK/CEntity/CEntity.h"
+#include "../Framework/ImGui/Fonts/RobotoRegular.h"
+#include "../Framework/ImGui/Fonts/fa.h"
+#include "../Framework/ImGui/Fonts/IconsFontAwesome6.h"
+#pragma comment(lib, "freetype.lib")
 
 class CFramework
 {
 public:
+    void Init();
     void UpdateList();
     void MiscAll();
     bool AimBot(CEntity& target);
@@ -16,6 +21,8 @@ public:
 	void RenderMenu();
 	void RenderESP();
 private:
+    ImFont* icon;
+
     CEntity local, *pLocal = &local;
     std::vector<CEntity> EntityList;
     std::vector<std::string> SpectatorPlayerName;
