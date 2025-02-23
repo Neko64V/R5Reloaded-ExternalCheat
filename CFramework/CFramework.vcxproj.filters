@@ -25,18 +25,6 @@
     <Filter Include="Framework\Overlay">
       <UniqueIdentifier>{afb86de2-e5e1-42f3-a8d7-f18ca76f4a17}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Framework\Utils">
-      <UniqueIdentifier>{04b8cfc8-34d2-4204-b232-2352bc502d06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Framework\Utils\Config">
-      <UniqueIdentifier>{c82edab8-686a-41c7-96f1-7031c65e600e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Framework\Utils\Memory">
-      <UniqueIdentifier>{a54e8b14-8dc1-4d46-9721-90adf06a29c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Framework\Utils\SimpleMath">
-      <UniqueIdentifier>{cd5d489e-5761-4c40-9420-fbe3d14315d0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Cheat\SDK">
       <UniqueIdentifier>{32ca098a-5183-47e8-ae19-3f1ca8e372b6}</UniqueIdentifier>
     </Filter>
@@ -45,6 +33,18 @@
     </Filter>
     <Filter Include="Cheat\SDK\CEntity">
       <UniqueIdentifier>{afd37619-aa38-4c63-9a7d-bf8fa35dcf37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Config">
+      <UniqueIdentifier>{c82edab8-686a-41c7-96f1-7031c65e600e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Memory">
+      <UniqueIdentifier>{a54e8b14-8dc1-4d46-9721-90adf06a29c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\SimpleMath">
+      <UniqueIdentifier>{cd5d489e-5761-4c40-9420-fbe3d14315d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\ImGui\Fonts">
+      <UniqueIdentifier>{1abed451-aade-4c55-aba3-7f60b13b71b1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,15 +75,6 @@
     <ClCompile Include="Framework\Overlay\Overlay.cpp">
       <Filter>Framework\Overlay</Filter>
     </ClCompile>
-    <ClCompile Include="Framework\Utils\Memory\Memory.cpp">
-      <Filter>Framework\Utils\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Framework\Utils\Config\Config.cpp">
-      <Filter>Framework\Utils\Config</Filter>
-    </ClCompile>
-    <ClCompile Include="Framework\Utils\Utils.cpp">
-      <Filter>Framework\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Cheat\Features.cpp">
       <Filter>Cheat</Filter>
     </ClCompile>
@@ -101,6 +92,18 @@
     </ClCompile>
     <ClCompile Include="Framework\Overlay\Manager.cpp">
       <Filter>Framework\Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Memory\Memory.cpp">
+      <Filter>Framework\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Utils.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Config\Config.cpp">
+      <Filter>Framework\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui_freetype.cpp">
+      <Filter>Framework\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -134,18 +137,6 @@
     <ClInclude Include="Framework\Overlay\Overlay.h">
       <Filter>Framework\Overlay</Filter>
     </ClInclude>
-    <ClInclude Include="Framework\Utils\SimpleMath\SimpleMath.h">
-      <Filter>Framework\Utils\SimpleMath</Filter>
-    </ClInclude>
-    <ClInclude Include="Framework\Utils\Memory\Memory.h">
-      <Filter>Framework\Utils\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Framework\Utils\Config\Config.h">
-      <Filter>Framework\Utils\Config</Filter>
-    </ClInclude>
-    <ClInclude Include="Framework\Utils\Utils.h">
-      <Filter>Framework\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Cheat\FrameCore.h">
       <Filter>Cheat</Filter>
     </ClInclude>
@@ -155,14 +146,38 @@
     <ClInclude Include="Cheat\SDK\CEntity\CEntity.h">
       <Filter>Cheat\SDK\CEntity</Filter>
     </ClInclude>
+    <ClInclude Include="Framework\Memory\Memory.h">
+      <Filter>Framework\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\SimpleMath\SimpleMath.h">
+      <Filter>Framework\SimpleMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Utils.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Config\Config.h">
+      <Filter>Framework\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\Fonts\fa.h">
+      <Filter>Framework\ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\Fonts\IconsFontAwesome6.h">
+      <Filter>Framework\ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\Fonts\RobotoRegular.h">
+      <Filter>Framework\ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imgui_freetype.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Framework\Utils\SimpleMath\SimpleMath.inl">
-      <Filter>Framework\Utils\SimpleMath</Filter>
-    </None>
     <None Include="..\README.md" />
     <None Include="..\.gitignore" />
     <None Include="..\LICENSE" />
+    <None Include="Framework\SimpleMath\SimpleMath.inl">
+      <Filter>Framework\SimpleMath</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\dump.txt" />
