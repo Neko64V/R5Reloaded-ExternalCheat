@@ -1,54 +1,45 @@
 #pragma once
-#include "../../../Framework/Utils/Utils.h"
+#include "../../../Framework/Utils.h"
 
 namespace offset
 {
 	// Main
-	const uintptr_t dwEntityList = 0x1F33F78;
-	const uintptr_t dwLocalPlayer = 0x22E93F8;
-	const uintptr_t ViewRender = 0xD4138F0;
-	const uintptr_t ViewMatrix = 0x1A93D0;
-	const uintptr_t TimeScale = 0x1843340; // base + this (float)
+	constexpr auto dwEntityList = 0x1F33F78;
+	constexpr auto dwLocalPlayer = 0x22E93F8;
+	constexpr auto ViewRender = 0xD4138F0;
+	constexpr auto ViewMatrix = 0x1A93D0;
+	constexpr auto TimeScale = 0x1843340; // base + this (float)
 
 	// https://github.com/cryotb/R5R_AimAssist_Forcer
-	// Ç±ÇËÇ·Ç∑Ç≤Ç¢Åc
-	const uintptr_t AimAssistVal = 0x1718B00;
+	constexpr auto AimAssistVal = 0x1718B00;
 
 	// Button
-	const uintptr_t in_jump = 0xd415120;
+	constexpr auto in_jump = 0xd415120;
 
 	// CBaseEntity
-	const uintptr_t m_fFlags			= 0x98;
-	const uintptr_t m_vecAbsVelocity	= 0x140;
-	const uintptr_t m_localOrigin		= 0x14C;
-	const uintptr_t m_shieldHealth		= 0x170;
-	const uintptr_t m_shieldHealthMax	= 0x174;
-	const uintptr_t m_iHealth			= 0x3E0;
-	const uintptr_t m_iTeamNum			= 0x3F0;
-	const uintptr_t m_localAngle		= 0x428;
-	const uintptr_t m_hOwnerEntity		= 0x43c;
-	const uintptr_t m_Collision			= 0x458;
-	const uintptr_t	m_CollisionGroup	= 0x4d8;
-	const uintptr_t m_iMaxHealth		= 0x510;
-	const uintptr_t m_iSignifierName	= 0x518;
-	const uintptr_t m_lifeState			= 0x730;
-	const uintptr_t camera_origin		= 0x1b68;
-	const uintptr_t m_lastvisibletime	= 0x1754;
-	const uintptr_t m_vecPunchAngle		= 0x20bc;
-	const uintptr_t m_SwayAngle			= 0x2178;
-	const uintptr_t m_ViewAngle			= 0x2188;
-
-	const uintptr_t	m_vecPunchBase_Angle = 0x20a4;
-	const uintptr_t	m_vecPunchBase_AngleVel = 0x20b0;
-	const uintptr_t	m_vecPunchWeapon_Angle = 0x20bc;
-	const uintptr_t	m_vecPunchWeapon_AngleVel = 0x20c8;
-
-	const uintptr_t m_platformUserId	= 0x2220;
-	const uintptr_t m_iObserverMode		= 0x2fcc;
-	const uintptr_t m_hObserverTarget	= 0x2fd0;
-
-	const uintptr_t m_nSkin				= 0xE48;
-	const uintptr_t m_pBoneMatrix		= 0xEE0;
+	constexpr auto m_fFlags				= 0x98;
+	constexpr auto m_pBoneMatrix		= 0xEE0;
+	constexpr auto m_vecAbsVelocity		= 0x140;
+	constexpr auto m_localOrigin		= 0x14C;
+	constexpr auto m_shieldHealth		= 0x170;
+	constexpr auto m_shieldHealthMax	= 0x174;
+	constexpr auto m_iHealth			= 0x3E0;
+	constexpr auto m_iTeamNum			= 0x3F0;
+	// constexpr auto m_hOwnerEntity		= 0x43c;
+	constexpr auto m_Collision			= 0x458;
+	constexpr auto m_iMaxHealth			= 0x510;
+	constexpr auto m_iSignifierName		= 0x518;
+	constexpr auto m_lifeState			= 0x730;
+	constexpr auto camera_origin		= 0x1b68;
+	constexpr auto m_lastvisibletime	= 0x1754;
+	constexpr auto m_vecPunchBase_Angle = 0x20a4;
+	constexpr auto m_vecPunchWeapon_Angle = 0x20bc;
+	constexpr auto m_vecPunchAngle		= 0x20bc;
+	constexpr auto m_vecSwayAngle		= 0x2178;
+	constexpr auto m_vecViewAngle		= 0x2188;
+	constexpr auto m_iObserverMode		= 0x2fcc;
+	constexpr auto m_hObserverTarget	= 0x2fd0;
+	constexpr auto m_szName				= 0x3BF8;
 };
 
 struct Bone
@@ -61,13 +52,11 @@ struct Bone
 	float z;
 };
 
-struct GlowMode
-{
+struct GlowMode {
 	int8_t GeneralGlowMode, BorderGlowMode, BorderSize, TransparentLevel;
 };
 
-struct GlowColor
-{
+struct GlowColor {
 	float R, G, B;
 };
 

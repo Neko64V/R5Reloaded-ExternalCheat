@@ -2,30 +2,30 @@
 
 bool CEntity::Update()
 {
-	m_vecAbsOrigin	  = m.Read<Vector3>(address + offset::m_localOrigin);
-	m_iHealth		  = m.Read<int>(address + offset::m_iHealth);
+	m_vecAbsOrigin	  = m.Read<Vector3>(m_address + offset::m_localOrigin);
+	m_iHealth		  = m.Read<int>(m_address + offset::m_iHealth);
 	
-	if (Vec3_Empty(m_vecAbsOrigin) || m_iHealth <= 0)
+	if (IsDead() || Vec3_Empty(m_vecAbsOrigin) || m_iHealth <= 0)
 		return false;
 		
-	pBoneArray		  = m.Read<uintptr_t>(address + offset::m_pBoneMatrix);
-	m_vecAbsVelocity  = m.Read<Vector3>(address + offset::m_vecAbsVelocity);
-	m_shieldHealth	  = m.Read<int>(address + offset::m_shieldHealth);
-	m_lastvisibletime = m.Read<float>(address + offset::m_lastvisibletime);
-	camera_origin	  = m.Read<Vector3>(address + offset::camera_origin);
+	pBoneArray		  = m.Read<uintptr_t>(m_address + offset::m_pBoneMatrix);
+	m_vecAbsVelocity  = m.Read<Vector3>(m_address + offset::m_vecAbsVelocity);
+	m_shieldHealth	  = m.Read<int>(m_address + offset::m_shieldHealth);
+	m_lastvisibletime = m.Read<float>(m_address + offset::m_lastvisibletime);
+	camera_origin	  = m.Read<Vector3>(m_address + offset::camera_origin);
 
 	return true;
 }
 
 void CEntity::UpdateStatic()
 {
-	m_iTeamNum = m.Read<int>(address + offset::m_iTeamNum);
-	m_iMaxHealth = m.Read<int>(address + offset::m_iMaxHealth);
-	m_shieldHealthMax = m.Read<int>(address + offset::m_shieldHealthMax);
+	m_iTeamNum = m.Read<int>(m_address + offset::m_iTeamNum);
+	m_iMaxHealth = m.Read<int>(m_address + offset::m_iMaxHealth);
+	m_shieldHealthMax = m.Read<int>(m_address + offset::m_shieldHealthMax);
 
 	// Name
 	char name[32]{};
-	uintptr_t NameAddress = m.Read<uintptr_t>(address + 0x3BF8);
+	uintptr_t NameAddress = m.Read<uintptr_t>(m_address + offset::m_szName);
 	m.ReadString(NameAddress, name, sizeof(name));
 	pName = name;
 }
@@ -37,66 +37,66 @@ bool CEntity::IsPlayer()
 
 bool CEntity::IsSpectator()
 {
-	return m_iObserverMode == 5;
+	return m.Read<int>(m_address + offset::m_iObserverMode) == 5;
 }
 
 Vector3 CEntity::vecMin()
 {
-	return m.Read<Vector3>(address + offset::m_Collision + 0x10) + m_vecAbsOrigin;
+	return m.Read<Vector3>(m_address + offset::m_Collision + 0x10) + m_vecAbsOrigin;
 }
 
 Vector3 CEntity::vecMax()
 {
-	return m.Read<Vector3>(address + offset::m_Collision + 0x1C) + m_vecAbsOrigin;
+	return m.Read<Vector3>(m_address + offset::m_Collision + 0x1C) + m_vecAbsOrigin;
 }
 
 int CEntity::GetFlag()
 {
-	return m.Read<int>(address + offset::m_fFlags);
+	return m.Read<int>(m_address + offset::m_fFlags);
 }
 
 bool CEntity::IsDead()
 {
-	return m.Read<int>(address + offset::m_lifeState) > 0;
+	return m.Read<int>(m_address + offset::m_lifeState) > 0;
 }
 
 Vector3 CEntity::GetViewAngle()
 {
-	return m.Read<Vector3>(address + offset::m_ViewAngle);
+	return m.Read<Vector3>(m_address + offset::m_vecViewAngle);
 }
 
 Vector3 CEntity::GetSwayAngle()
 {
-	return m.Read<Vector3>(address + offset::m_SwayAngle);
+	return m.Read<Vector3>(m_address + offset::m_vecSwayAngle);
 }
 
 Vector3 CEntity::GetPunchAngle()
 {
-	return m.Read<Vector3>(address + offset::m_vecPunchAngle);
+	return m.Read<Vector3>(m_address + offset::m_vecPunchAngle);
 }
 
 Vector3 CEntity::GetWeaponPunchAngle()
 {
-	return m.Read<Vector3>(address + offset::m_vecPunchWeapon_Angle);
+	return m.Read<Vector3>(m_address + offset::m_vecPunchWeapon_Angle);
 }
 
 float CEntity::GetTimeBase()
 {
-	return m.Read<float>(address + 0x1D18);
+	return m.Read<float>(m_address + 0x1D18);
 }
 
 void CEntity::EnableGlow(GlowColor color, GlowMode mode)
 {
-	m.Write<int>(address + 0x310, 1);
-	m.Write<int>(address + 0x320, 2);
-	m.Write<GlowMode>(address + 0x27C, mode);
-	m.Write<GlowColor>(address + 0x1D0, color);
+	m.Write<int>(m_address + 0x310, 1);
+	m.Write<int>(m_address + 0x320, 2);
+	m.Write<GlowMode>(m_address + 0x27C, mode);
+	m.Write<GlowColor>(m_address + 0x1D0, color);
 }
 
 void CEntity::DisableGlow()
 {
-	m.Write<int>(address + 0x310, 0);
-	m.Write<int>(address + 0x320, 0);
+	m.Write<int>(m_address + 0x310, 0);
+	m.Write<int>(m_address + 0x320, 0);
 }
 
 Vector3 CEntity::GetEntityBonePosition(int BoneId)

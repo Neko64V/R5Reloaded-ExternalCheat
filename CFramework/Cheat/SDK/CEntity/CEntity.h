@@ -4,7 +4,7 @@
 class CEntity
 {
 public:
-    uintptr_t address;
+    uintptr_t m_address;
 
 	// Player
 	Vector3 m_vecAbsVelocity;
@@ -16,7 +16,6 @@ public:
 	int m_iMaxHealth;
 	int m_lifeState;
 	float m_lastvisibletime;
-	int m_iObserverMode;
 	Vector3 camera_origin;
 	std::string pName;
 	std::string m_iSignifierName;
@@ -26,9 +25,8 @@ public:
 	bool Update();
 	void UpdateStatic();
 	bool IsPlayer();
-	bool IsSpectator();
-
 	bool IsDead();
+	bool IsSpectator();
 
 	Vector3 vecMin();
 	Vector3 vecMax();
